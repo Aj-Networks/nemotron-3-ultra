@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nemotron 3 Ultra + OpenCode Setup Guide</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; line-height: 1.6; color: #1a1a1a; background: #fafafa; }
+        .container { max-width: 900px; margin: 0 auto; padding: 2rem; }
+        header { text-align: center; margin-bottom: 3rem; padding: 2rem 0; border-bottom: 1px solid #e0e0e0; }
+        h1 { font-size: 2.5rem; color: #76b900; margin-bottom: 0.5rem; }
+        .subtitle { color: #666; font-size: 1.1rem; }
+        .step { background: white; border-radius: 8px; padding: 2rem; margin-bottom: 1.5rem; box-shadow: 0 2px 8px rgba(0,0,0,0.05); border: 1px solid #e8e8e8; }
+        .step-number { display: inline-block; background: #76b900; color: white; width: 32px; height: 32px; border-radius: 50%; text-align: center; line-height: 32px; font-weight: bold; margin-bottom: 1rem; }
+        .step h2 { color: #333; margin-bottom: 1rem; }
+        .step p { color: #444; margin-bottom: 1rem; }
+        .code-block { background: #1e1e1e; color: #d4d4d4; padding: 1rem; border-radius: 6px; overflow-x: auto; font-family: 'Monaco', 'Consolas', monospace; font-size: 0.9rem; margin: 1rem 0; }
+        .code-block .comment { color: #6a9955; }
+        .code-block .keyword { color: #569cd6; }
+        .code-block .string { color: #ce9178; }
+        .screenshot { max-width: 100%; border-radius: 6px; border: 1px solid #e0e0e0; margin: 1rem 0; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+        .badge { display: inline-block; padding: 0.25rem 0.75rem; border-radius: 999px; font-size: 0.75rem; font-weight: 600; margin-right: 0.5rem; }
+        .badge-free { background: #d4edda; color: #155724; }
+        .badge-api { background: #cce5ff; color: #004085; }
+        .badge-local { background: #f8d7da; color: #721c24; }
+        .checklist { list-style: none; }
+        .checklist li { padding: 0.5rem 0; padding-left: 2rem; position: relative; }
+        .checklist li::before { content: "✓"; position: absolute; left: 0; color: #76b900; font-weight: bold; }
+        .tabs { display: flex; border-bottom: 2px solid #e0e0e0; margin-bottom: 1rem; }
+        .tab { padding: 0.75rem 1.5rem; cursor: pointer; border-bottom: 2px solid transparent; margin-bottom: -2px; font-weight: 500; color: #666; }
+        .tab.active { color: #76b900; border-bottom-color: #76b900; }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; animation: fadeIn 0.2s; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
+        .limit-card { background: #fff3cd; border: 1px solid #ffeeba; border-radius: 6px; padding: 1rem; margin: 1rem 0; }
+        .limit-card h4 { color: #856404; margin-bottom: 0.5rem; }
+        footer { text-align: center; padding: 2rem; color: #999; font-size: 0.9rem; }
+        .architecture { display: flex; justify-content: center; align-items: center; gap: 1rem; flex-wrap: wrap; margin: 1.5rem 0; }
+        .arch-box { background: white; border: 2px solid #76b900; border-radius: 8px; padding: 1rem 1.5rem; text-align: center; min-width: 180px; }
+        .arch-arrow { color: #76b900; font-size: 1.5rem; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Nemotron 3 Ultra + OpenCode</h1>
+            <p class="subtitle">Run NVIDIA's 550B parameter MoE model in your terminal for free</p>
+            <div style="margin-top: 1rem;">
+                <span class="badge badge-free">Free API Tier</span>
+                <span class="badge badge-api">OpenAI Compatible</span>
+                <span class="badge badge-local">No GPU Required</span>
+            </div>
+        </header>
+
+        <div class="architecture">
+            <div class="arch-box">
+                <strong>Your Machine</strong><br>
+                <small>OpenCode Terminal</small>
+            </div>
+            <div class="arch-arrow">→</div>
+            <div class="arch-box">
+                <strong>NVIDIA API</strong><br>
+                <small>build.nvidia.com</small>
+            </div>
+            <div class="arch-arrow">→</div>
+            <div class="arch-box">
+                <strong>Nemotron 3 Ultra</strong><br>
+                <small>550B / 55B Active</small>
+            </div>
+        </div>
+
+        <!-- Step 1: Requirements -->
+        <div class="step">
+            <div class="step-number">1</div>
+            <h2>Check Requirements</h2>
+            <p>Before starting, verify you have everything needed. No local GPU required: the model runs on NVIDIA's servers.</p>
+            <div class="tabs">
+                <div class="tab active" onclick="showTab('req-windows')">Windows</div>
+                <div class="tab" onclick="showTab('req-mac')">macOS</div>
+                <div class="tab" onclick="showTab('req-linux')">Linux</div>
+            </div>
+            <div id="req-windows" class="tab-content active">
+                <ul class="checklist">
+                    <li>Windows 10/11 with PowerShell</li>
+                    <li>Node.js 20+ LTS (<a href="https://nodejs.org" target="_blank">download</a>)</li>
+                    <li>Internet connection (required)</li>
+                    <li>NVIDIA account (free, <a href="https://build.nvidia.com" target="_blank">sign up</a>)</li>
+                </ul>
+                <div class="code-block"><span class="comment"># Verify Node.js version</span>
+node --version
+<span class="comment"># Should show v20.x.x or higher</span></div>
+            </div>
+            <div id="req-mac" class="tab-content">
+                <ul class="checklist">
+                    <li>macOS 12+ (Monterey or later)</li>
+                    <li>Node.js 20+ LTS (<code>brew install node</code>)</li>
+                    <li>Internet connection</li>
+                    <li>NVIDIA account (free)</li>
+                </ul>
+            </div>
+            <div id="req-linux" class="tab-content">
+                <ul class="checklist">
+                    <li>Ubuntu 20.04+ / Debian 11+ / Fedora 35+ / Arch</li>
+                    <li>Node.js 20+ LTS (<code>curl -fsSL https://deb.nodesource.com/setup_lts.x | sudo -E bash - && sudo apt-get install -y nodejs</code>)</li>
+                    <li>Internet connection</li>
+                    <li>NVIDIA account (free)</li>
+                </ul>
+            </div>
+            <div class="limit-card">
+                <h4>⚠ Not for Local Deployment</h4>
+                <p>Nemotron 3 Ultra requires datacenter hardware: 4× B200/GB200/GB300/B300 or 8× H100-80GB. This guide uses the <strong>hosted free API</strong> instead.</p>
+            </div>
+        </div>
+
+        <!-- Step 2: Install OpenCode -->
+        <div class="step">
+            <div class="step-number">2</div>
+            <h2>Install OpenCode</h2>
+            <p>OpenCode is the terminal-based AI coding agent that connects to Nemotron 3 Ultra via NVIDIA's API.</p>
+            <div class="tabs">
+                <div class="tab active" onclick="showTab('install-windows')">Windows (PowerShell)</div>
+                <div class="tab" onclick="showTab('install-unix')">macOS / Linux</div>
+            </div>
+            <div id="install-windows" class="tab-content active">
+                <div class="code-block"><span class="comment"># Install globally via npm</span>
+npm install -g opencode-ai
+
+<span class="comment"># Verify installation</span>
+opencode --version</div>
+            </div>
+            <div id="install-unix" class="tab-content">
+                <div class="code-block"><span class="comment"># Install globally via npm</span>
+npm install -g opencode-ai
+
+<span class="comment"># Verify installation</span>
+opencode --version</div>
+            </div>
+            <p><strong>What is OpenCode?</strong> A terminal-native AI agent that reads/writes files, runs commands, and uses tools: all while streaming responses from any OpenAI-compatible endpoint.</p>
+        </div>
+
+        <!-- Step 3: Get API Key -->
+        <div class="step">
+            <div class="step-number">3</div>
+            <h2>Get Your Free NVIDIA API Key</h2>
+            <p>Generate a key at <a href="https://build.nvidia.com" target="_blank">build.nvidia.com</a>. No credit card required.</p>
+            <ol style="padding-left: 1.5rem; margin: 1rem 0;">
+                <li>Sign in to <a href="https://build.nvidia.com" target="_blank">build.nvidia.com</a> with your NVIDIA account</li>
+                <li>Navigate to <strong>Nemotron 3 Ultra</strong> model page</li>
+                <li>Click <strong>Get API Key</strong> or go to <a href="https://build.nvidia.com/settings/api-keys" target="_blank">API Keys settings</a></li>
+                <li>Create a new key: copy it immediately (starts with <code>nvapi-</code>)</li>
+            </ol>
+            <img src="assets/images/step3-api-key.png" alt="NVIDIA API Key generation" class="screenshot" style="display: none;">
+            <p><em>Screenshot placeholder: Add your blurred API key screenshot here as <code>assets/images/step3-api-key.png</code></em></p>
+        </div>
+
+        <!-- Step 4: Configure -->
+        <div class="step">
+            <div class="step-number">4</div>
+            <h2>Configure OpenCode</h2>
+            <p>Create the config file that connects OpenCode to Nemotron 3 Ultra via NVIDIA's API.</p>
+            <div class="tabs">
+                <div class="tab active" onclick="showTab('config-windows')">Windows (PowerShell)</div>
+                <div class="tab" onclick="showTab('config-unix')">macOS / Linux</div>
+            </div>
+            <div id="config-windows" class="tab-content active">
+                <div class="code-block"><span class="comment"># Create config directory</span>
+New-Item -ItemType Directory -Force "$env:USERPROFILE\.config\opencode" | Out-Null
+
+<span class="comment"># Write config (uses env var, never stores key in file)</span>
+@'
+{
+  "$schema": "https://opencode.ai/config.json",
+  "model": "nvidia/nvidia/nemotron-3-ultra-550b-a55b",
+  "provider": {
+    "nvidia": {
+      "npm": "@ai-sdk/openai-compatible",
+      "name": "NVIDIA",
+      "options": {
+        "baseURL": "https://integrate.api.nvidia.com/v1",
+        "apiKey": "{env:NVIDIA_API_KEY}"
+      },
+      "models": {
+        "nvidia/nemotron-3-ultra-550b-a55b": {
+          "name": "Nemotron 3 Ultra"
+        }
+      }
+    }
+  }
+}
+'@ | Set-Content -Encoding utf8 "$env:USERPROFILE\.config\opencode\opencode.json"
+
+<span class="comment"># Set API key persistently</span>
+setx NVIDIA_API_KEY "nvapi-YOUR-KEY-HERE"
+<span class="comment"># Close and reopen PowerShell, then:</span>
+$env:NVIDIA_API_KEY = "nvapi-YOUR-KEY-HERE"</div>
+            </div>
+            <div id="config-unix" class="tab-content">
+                <div class="code-block"><span class="comment"># Create config directory</span>
+mkdir -p ~/.config/opencode
+
+<span class="comment"># Write config</span>
+cat > ~/.config/opencode/opencode.json << 'EOF'
+{
+  "$schema": "https://opencode.ai/config.json",
+  "model": "nvidia/nvidia/nemotron-3-ultra-550b-a55b",
+  "provider": {
+    "nvidia": {
+      "npm": "@ai-sdk/openai-compatible",
+      "name": "NVIDIA",
+      "options": {
+        "baseURL": "https://integrate.api.nvidia.com/v1",
+        "apiKey": "{env:NVIDIA_API_KEY}"
+      },
+      "models": {
+        "nvidia/nemotron-3-ultra-550b-a55b": {
+          "name": "Nemotron 3 Ultra"
+        }
+      }
+    }
+  }
+}
+EOF
+
+<span class="comment"># Set API key (add to ~/.bashrc or ~/.zshrc for persistence)</span>
+export NVIDIA_API_KEY="nvapi-YOUR-KEY-HERE"</div>
+            </div>
+        </div>
+
+        <!-- Step 5: Run -->
+        <div class="step">
+            <div class="step-number">5</div>
+            <h2>Run and Test</h2>
+            <p>Launch OpenCode from your project directory.</p>
+            <div class="code-block"><span class="comment"># Navigate to your project</span>
+cd C:\path\to\your\project
+
+<span class="comment"># Start OpenCode</span>
+opencode</div>
+            <p>On first run:</p>
+            <ol style="padding-left: 1.5rem; margin: 1rem 0;">
+                <li>Type <code>/models</code> and press Enter</li>
+                <li>Select <strong>Nemotron 3 Ultra (NVIDIA)</strong></li>
+                <li>Type <code>hello</code> to test</li>
+            </ol>
+            <img src="assets/images/step5-opencode-running.png" alt="OpenCode running with Nemotron 3 Ultra" class="screenshot" style="display: none;">
+            <p><em>Screenshot placeholder: Add your OpenCode terminal screenshot as <code>assets/images/step5-opencode-running.png</code></em></p>
+        </div>
+
+        <!-- Step 6: Memory & Cache -->
+        <div class="step">
+            <div class="step-number">6</div>
+            <h2>Memory, Cache & Project Isolation</h2>
+            <p>This repo includes a built-in memory and cache system for production use at scale.</p>
+            <div class="architecture">
+                <div class="arch-box">
+                    <strong>Global Memory</strong><br>
+                    <small>memory/global/MEMORY.md</small>
+                </div>
+                <div class="arch-arrow">↔</div>
+                <div class="arch-box">
+                    <strong>Project Memory</strong><br>
+                    <small>projects/<name>/MEMORY.md</small>
+                </div>
+                <div class="arch-arrow">↔</div>
+                <div class="arch-box">
+                    <strong>Cache</strong><br>
+                    <small>cache/global/ & cache/projects/</small>
+                </div>
+            </div>
+            <h3>Quick Commands</h3>
+            <div class="code-block"><span class="comment"># Initialize a new project</span>
+python scripts/memory_manager.py init my-project "My project description"
+
+<span class="comment"># List all projects</span>
+python scripts/memory_manager.py list
+
+<span class="comment"># Show system status</span>
+python scripts/memory_manager.py status
+
+<span class="comment"># Sync global memory (git pull)</span>
+python scripts/memory_manager.py sync</div>
+            <h3>Folder Structure</h3>
+            <pre style="background: #f5f5f5; padding: 1rem; border-radius: 6px; font-size: 0.85rem;">nemotron-3-ultra/
+├── memory/
+│   └── global/
+│       └── MEMORY.md          # Shared across all projects
+├── cache/
+│   ├── global/                # Shared cache entries
+│   └── projects/
+│       └── <name>/            # Per-project cache
+├── projects/
+│   └── <name>/
+│       ├── MEMORY.md          # Project-specific memory
+│       ├── input/             # Your input files
+│       ├── output/            # Generated outputs
+│       └── cache/             # Project cache
+├── scripts/
+│   ├── memory_manager.py      # Memory/cache CLI
+│   ├── setup-windows.ps1      # Windows automated setup
+│   └── setup-unix.sh          # macOS/Linux automated setup
+├── docs/
+│   ├── 00-limitations.md      # Official model limits
+│   ├── 01-requirements.md
+│   ├── 02-install-opencode.md
+│   ├── 03-get-nvidia-api-key.md
+│   ├── 04-configure-opencode.md
+│   ├── 05-troubleshooting.md
+│   └── 06-security-and-costs.md
+├── examples/
+│   └── opencode.example.json  # Config template
+└── website/
+    └── index.html             # This page</pre>
+        </div>
+
+        <!-- Limitations -->
+        <div class="step">
+            <div class="step-number">7</div>
+            <h2>Official Limitations (Free API Tier)</h2>
+            <p>Key constraints from NVIDIA's model card for <code>nvidia/nemotron-3-ultra-550b-a55b</code>:</p>
+            <div class="limit-card">
+                <h4>Free Tier Limits</h4>
+                <ul style="padding-left: 1.5rem;">
+                    <li><strong>Rate limits:</strong> Not published. Expect ~10-20 req/min, ~50k-100k tokens/min</li>
+                    <li><strong>Daily quota:</strong> Not published. Resets on 429 errors</li>
+                    <li><strong>No SLA:</strong> Free tier can be throttled or disabled anytime</li>
+                    <li><strong>Logging:</strong> NVIDIA logs usage for security/product improvement</li>
+                    <li><strong>Context:</strong> Up to 1M tokens (API may enforce lower)</li>
+                    <li><strong>Concurrent:</strong> Limited (single-digit typically)</li>
+                </ul>
+            </div>
+            <div class="limit-card">
+                <h4>Model Capabilities</h4>
+                <ul style="padding-left: 1.5rem;">
+                    <li><strong>550B total / 55B active</strong> (LatentMoE: Mamba-2 + MoE + Attention)</li>
+                    <li><strong>1M token context</strong> (requires chunked prefill)</li>
+                    <li><strong>12 languages:</strong> EN, FR, ES, IT, DE, JA, KO, HI, PT, ZH</li>
+                    <li><strong>Reasoning:</strong> Configurable via <code>enable_thinking: true/false</code></li>
+                    <li><strong>Benchmarks:</strong> SWE-Bench 69.7% (NVFP4), GPQA 87.9%, RULER 1M 94.0%</li>
+                </ul>
+            </div>
+            <div class="limit-card">
+                <h4>Production at Scale (Millions of Users)</h4>
+                <ul style="padding-left: 1.5rem;">
+                    <li>Free tier <strong>not suitable</strong> for high-volume production</li>
+                    <li>Self-host: 4× B200 (~$12-16/hr cloud) or 8× H100 (~$24-32/hr)</li>
+                    <li>Implement: token-bucket rate limiter, exponential backoff, semantic cache</li>
+                    <li>Fallback: OpenRouter <code>nvidia/nemotron-3-ultra-550b-a55b:free</code></li>
+                    <li>Set <code>reasoning_budget: 512-1024</code> for cost/latency control</li>
+                </ul>
+            </div>
+            <p><a href="docs/00-limitations.md">Full limitations documentation →</a></p>
+        </div>
+
+        <!-- Automated Setup -->
+        <div class="step">
+            <div class="step-number">🚀</div>
+            <h2>Automated Setup (Recommended)</h2>
+            <p>Use the provided scripts for one-command setup.</p>
+            <div class="tabs">
+                <div class="tab active" onclick="showTab('auto-windows')">Windows</div>
+                <div class="tab" onclick="showTab('auto-unix')">macOS / Linux</div>
+            </div>
+            <div id="auto-windows" class="tab-content active">
+                <div class="code-block"><span class="comment"># Run in PowerShell (from repo root)</span>
+.\scripts\setup-windows.ps1 -ProjectName my-app</div>
+                <p>This script: checks Node.js, installs OpenCode, securely prompts for API key, sets env var, writes config, initializes project memory.</p>
+            </div>
+            <div id="auto-unix" class="tab-content">
+                <div class="code-block"><span class="comment"># Make executable and run</span>
+chmod +x scripts/setup-unix.sh
+./scripts/setup-unix.sh my-app</div>
+                <p>Same features as Windows script, for bash/zsh.</p>
+            </div>
+        </div>
+
+        <footer>
+            <p>Nemotron 3 Ultra + OpenCode Setup Guide | <a href="https://github.com/nvidia/nemotron" target="_blank">Official Model</a> | <a href="https://opencode.ai" target="_blank">OpenCode</a> | <a href="https://build.nvidia.com" target="_blank">Free API</a></p>
+            <p>Not affiliated with NVIDIA or OpenCode. Free tier terms and limits can change.</p>
+        </footer>
+    </div>
+
+    <script>
+        function showTab(id) {
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+            event.target.classList.add('active');
+            document.getElementById(id).classList.add('active');
+        }
+    </script>
+</body>
+</html>
