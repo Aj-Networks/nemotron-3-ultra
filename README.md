@@ -2,7 +2,7 @@
 
 Run NVIDIA's **Nemotron 3 Ultra (550B)** as a coding assistant in your terminal. Free API, no GPU, no credit card.
 
-**Try it and [share your thoughts](https://github.com/Aj-Networks/nemotron-3-ultra/issues).**
+**Try it and share your thoughts** (Reddit thread: coming soon)
 
 **[Open the step-by-step guide](https://aj-networks.github.io/nemotron-3-ultra/)** for a visual walkthrough.
 
