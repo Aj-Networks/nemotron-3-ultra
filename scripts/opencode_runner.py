@@ -32,10 +32,6 @@ class OpenCodeRunner:
             print("Phase 1: SKIPPED (--skip-phase1)")
             return True
 
-        print("\n" + "=" * 60)
-        print("PHASE 1: SETUP VERIFICATION")
-        print("=" * 60)
-
         verifier = Phase1Verifier()
         success = verifier.run_all(self.project_name)
 
