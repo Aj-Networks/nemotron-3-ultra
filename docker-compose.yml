@@ -1,0 +1,178 @@
+version: '3.8'
+
+services:
+  # Nemotron 3 Ultra via vLLM (self-hosted, requires 4x B200/GB200 or 8x H100)
+  nemotron-vllm:
+    image: vllm/vllm-openai:v0.22.0
+    container_name: nemotron-ultra-vllm
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 4
+              capabilities: [gpu]
+    environment:
+      - VLLM_WORKER_MULTIPROC_METHOD=spawn
+      - SAFETENSORS_FAST_GPU=1
+      - NVIDIA_TF32_OVERRIDE=1
+      - VLLM_LOGGING_LEVEL=INFO
+    volumes:
+      - ${MODEL_PATH:-/models/nemotron-3-ultra}:/model:ro
+    command: >
+      /model
+      --host 0.0.0.0
+      --port 8000
+      --served-model-name nvidia/nemotron-3-ultra
+      --trust-remote-code
+      --tensor-parallel-size 4
+      --enable-expert-parallel
+      --kv-cache-dtype fp8
+      --max-model-len 262144
+      --gpu-memory-utilization 0.90
+      --max-num-seqs 16
+      --max-num-batched-tokens 32768
+      --enable-chunked-prefill
+      --enable-prefix-caching
+      --reasoning-parser nemotron_v3
+      --enable-auto-tool-choice
+      --tool-call-parser qwen3_coder
+      --mamba-ssm-cache-dtype float16
+      --mamba-backend flashinfer
+      --enable-mamba-cache-stochastic-rounding
+      --mamba-cache-philox-rounds 5
+      --speculative-config '{"method": "nemotron_h_mtp", "num_speculative_tokens": 5}'
+      --model-loader-extra-config '{"enable_multithread_load": true, "num_threads": 96}'
+    ports:
+      - "8000:8000"
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 120s
+
+  # Alternative: SGLang (often faster for Nemotron)
+  nemotron-sglang:
+    image: lmsysorg/sglang:v0.5.11
+    container_name: nemotron-ultra-sglang
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 4
+              capabilities: [gpu]
+    environment:
+      - SAFETENSORS_FAST_GPU=1
+      - NVIDIA_TF32_OVERRIDE=1
+      - SGLANG_DISABLE_DEEP_GEMM=1
+    volumes:
+      - ${MODEL_PATH:-/models/nemotron-3-ultra}:/model:ro
+    command: >
+      python3 -m sglang.launch_server
+      --model-path /model
+      --host 0.0.0.0
+      --port 8000
+      --served-model-name nvidia/nemotron-3-ultra
+      --tp-size 4
+      --ep-size 4
+      --context-length 262144
+      --mem-fraction-static 0.85
+      --chunked-prefill-size 32768
+      --fp8-gemm-backend triton
+      --moe-runner-backend triton
+      --mamba-scheduler-strategy no_buffer
+      --disable-piecewise-cuda-graph
+      --reasoning-parser nemotron_3
+      --tool-call-parser qwen3_coder
+      --speculative-algorithm EAGLE
+      --speculative-num-steps 5
+      --speculative-eagle-topk 1
+      --speculative-num-draft-tokens 5
+      --kv-cache-dtype nvfp4
+      --trust-remote-code
+      --log-level info
+    ports:
+      - "8001:8000"
+    restart: unless-stopped
+    profiles: ["sglang"]
+
+  # API Gateway with rate limiting, auth, monitoring
+  api-gateway:
+    image: kong:3.4
+    container_name: nemotron-gateway
+    environment:
+      - KONG_DATABASE=off
+      - KONG_DECLARATIVE_CONFIG=/kong/kong.yml
+      - KONG_PROXY_ACCESS_LOG=/dev/stdout
+      - KONG_ADMIN_ACCESS_LOG=/dev/stdout
+      - KONG_PROXY_ERROR_LOG=/dev/stderr
+      - KONG_ADMIN_ERROR_LOG=/dev/stderr
+      - KONG_ADMIN_LISTEN=0.0.0.0:8001
+    volumes:
+      - ./gateway/kong.yml:/kong/kong.yml:ro
+    ports:
+      - "8000:8000"
+      - "8443:8443"
+      - "8001:8001"
+    depends_on:
+      - nemotron-vllm
+    restart: unless-stopped
+
+  # Prometheus for metrics
+  prometheus:
+    image: prom/prometheus:v2.52
+    container_name: nemotron-prometheus
+    volumes:
+      - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus-data:/prometheus
+    ports:
+      - "9090:9090"
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/etc/prometheus/console_libraries'
+      - '--web.console.templates=/etc/prometheus/consoles'
+    restart: unless-stopped
+
+  # Grafana for dashboards
+  grafana:
+    image: grafana/grafana:10.4
+    container_name: nemotron-grafana
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_PASSWORD:-admin}
+      - GF_USERS_ALLOW_SIGN_UP=false
+    volumes:
+      - ./monitoring/dashboards:/etc/grafana/provisioning/dashboards:ro
+      - ./monitoring/datasources:/etc/grafana/provisioning/datasources:ro
+      - grafana-data:/var/lib/grafana
+    ports:
+      - "3000:3000"
+    depends_on:
+      - prometheus
+    restart: unless-stopped
+
+  # Redis for distributed rate limiting / cache
+  redis:
+    image: redis:7-alpine
+    container_name: nemotron-redis
+    command: redis-server --maxmemory 256mb --maxmemory-policy allkeys-lru
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+    restart: unless-stopped
+
+volumes:
+  prometheus-data:
+  grafana-data:
+  redis-data:
+
+# Usage:
+# 1. Set MODEL_PATH to your Nemotron 3 Ultra NVFP4 checkpoint
+# 2. For free API tier: comment out nemotron-vllm/sglang, use gateway to proxy to NVIDIA
+# 3. Run: docker-compose up -d
+# 4. Access: http://localhost:8000 (API), http://localhost:3000 (Grafana), http://localhost:9090 (Prometheus)

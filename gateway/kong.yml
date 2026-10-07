@@ -1,0 +1,154 @@
+_format_version: "3.0"
+_transform: true
+
+# Kong Gateway Config for Nemotron 3 Ultra API
+# Provides: Rate limiting, Authentication, Logging, Request/Response transformation
+
+services:
+  - name: nemotron-api
+    url: http://nemotron-vllm:8000/v1
+    routes:
+      - name: nemotron-route
+        paths:
+          - /v1
+        strip_path: false
+    plugins:
+      # Rate limiting per consumer (API key)
+      - name: rate-limiting
+        config:
+          minute: 60
+          hour: 1000
+          day: 10000
+          policy: redis
+          redis_host: redis
+          redis_port: 6379
+          fault_tolerant: true
+          hide_client_headers: false
+
+      # Authentication via API key
+      - name: key-auth
+        config:
+          key_names:
+            - apikey
+          hide_credentials: true
+
+      # Request size limit
+      - name: request-size-limiting
+        config:
+          allowed_payload_size: 128
+
+      # Response logging
+      - name: http-log
+        config:
+          http_endpoint: http://log-collector:8080/logs
+          method: POST
+          timeout: 5000
+          keepalive: 1000
+          flush_timeout: 2
+
+      # Correlation ID
+      - name: correlation-id
+        config:
+          header_name: X-Request-ID
+          generator: uuid
+          echo_downstream: true
+
+      # Request transformation (add defaults)
+      - name: request-transformer
+        config:
+          add:
+            headers:
+              - X-Forwarded-Model:nvidia/nemotron-3-ultra
+            body:
+              - max_tokens:32000
+              - temperature:1.0
+              - top_p:0.95
+              - extra_body:{"chat_template_kwargs": {"enable_thinking": true, "force_nonempty_content": true}}
+
+      # Response transformation
+      - name: response-transformer
+        config:
+          add:
+            headers:
+              - X-Model:nvidia/nemotron-3-ultra-550b-a55b
+              - X-Provider:NVIDIA
+
+      # Circuit breaker (protect upstream)
+      - name: circuit-breaker
+        config:
+          breaker_threshold: 50
+          breaker_period: 60
+          recovery_time: 30
+
+      # IP restriction (optional)
+      # - name: ip-restriction
+      #   config:
+      #     allow:
+      #       - 10.0.0.0/8
+      #       - 172.16.0.0/12
+
+consumers:
+  - username: nemotron-user
+    custom_id: user-001
+    plugins:
+      - name: key-auth
+        config:
+          key: ${CONSUMER_API_KEY}
+
+  - username: nemotron-admin
+    custom_id: admin-001
+    plugins:
+      - name: key-auth
+        config:
+          key: ${ADMIN_API_KEY}
+      - name: rate-limiting
+        config:
+          minute: 300
+          hour: 10000
+          day: 100000
+          policy: redis
+          redis_host: redis
+          redis_port: 6379
+
+# Upstream for self-hosted with health checks
+upstreams:
+  - name: nemotron-upstream
+    algorithm: round-robin
+    hash_on: none
+    slots: 10000
+    healthchecks:
+      active:
+        type: http
+        http_path: /health
+        healthy:
+          interval: 10
+          successes: 2
+        unhealthy:
+          interval: 10
+          http_failures: 3
+          tcp_failures: 3
+        timeout: 5
+      passive:
+        healthy:
+          successes: 5
+        unhealthy:
+          http_failures: 10
+          tcp_failures: 10
+    targets:
+      - target: nemotron-vllm:8000
+        weight: 100
+      # - target: nemotron-sglang:8000
+      #   weight: 100
+
+# Certificates for TLS (optional)
+# certificates:
+#   - cert: |
+#       -----BEGIN CERTIFICATE-----
+#       ...
+#       -----END CERTIFICATE-----
+#     key: |
+#       -----BEGIN PRIVATE KEY-----
+#       ...
+#       -----END PRIVATE KEY-----
+#     snis:
+#       - api.nemotron.example.com

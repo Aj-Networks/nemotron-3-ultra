@@ -1,0 +1,59 @@
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+  external_labels:
+    cluster: nemotron-3-ultra
+    environment: production
+
+alerting:
+  alertmanagers:
+    - static_configs:
+        - targets: []
+
+rule_files: []
+
+scrape_configs:
+  # Prometheus self-monitoring
+  - job_name: prometheus
+    static_configs:
+      - targets: ['localhost:9090']
+
+  # Kong API Gateway metrics
+  - job_name: kong
+    static_configs:
+      - targets: ['api-gateway:8001']
+    metrics_path: /metrics
+
+  # vLLM metrics (if running self-hosted)
+  - job_name: vllm
+    static_configs:
+      - targets: ['nemotron-vllm:8000']
+    metrics_path: /metrics
+
+  # SGLang metrics (if running)
+  - job_name: sglang
+    static_configs:
+      - targets: ['nemotron-sglang:8000']
+    metrics_path: /metrics
+
+  # Node exporter for host metrics
+  - job_name: node
+    static_configs:
+      - targets: ['host.docker.internal:9100']
+
+  # cAdvisor for container metrics
+  - job_name: cadvisor
+    static_configs:
+      - targets: ['cadvisor:8080']
+
+  # Redis metrics
+  - job_name: redis
+    static_configs:
+      - targets: ['redis:6379']
+
+# Remote write for long-term storage (optional)
+# remote_write:
+#   - url: https://prometheus.example.com/api/v1/write
+#     basic_auth:
+#       username: ${PROM_USER}
+#       password: ${PROM_PASS}
