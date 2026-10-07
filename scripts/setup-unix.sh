@@ -4,7 +4,7 @@
 
 set -euo pipefail
 
-REPO_ROOT="${HOME}/OneDrive/AI/nemotron 3 ultra"
+REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 PROJECT_NAME="${1:-default}"
 API_KEY="${2:-}"
 

@@ -28,7 +28,7 @@ param(
 
 $ErrorActionPreference = "Stop"
 
-$repoRoot = "$env:USERPROFILE\OneDrive\AI\nemotron 3 ultra"
+$repoRoot = Split-Path -Parent $PSScriptRoot
 $scriptPath = "$repoRoot\scripts\opencode_runner.py"
 
 if (-not (Test-Path $scriptPath)) {

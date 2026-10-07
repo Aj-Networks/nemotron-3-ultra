@@ -111,7 +111,7 @@ if (Test-Path $configFile -and -not $ForceReconfigure) {
 }
 
 # 6. Initialize memory/cache structure
-$repoRoot = "$env:USERPROFILE\OneDrive\AI\nemotron 3 ultra"
+$repoRoot = Split-Path -Parent $PSScriptRoot
 if (Test-Path $repoRoot) {
     Write-Host "`nInitializing memory/cache structure..." -ForegroundColor Yellow
     python "$repoRoot\scripts\memory_manager.py" init $ProjectName "Windows setup project"
