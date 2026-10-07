@@ -23,6 +23,9 @@ def ensure_dirs():
     """Create all required directories."""
     for d in [MEMORY_PROJECTS, CACHE_GLOBAL, CACHE_PROJECTS]:
         d.mkdir(parents=True, exist_ok=True)
+    template = MEMORY_GLOBAL.with_name("MEMORY.template.md")
+    if not MEMORY_GLOBAL.exists() and template.exists():
+        shutil.copyfile(template, MEMORY_GLOBAL)
 
 
 def get_project_path(name: str) -> Path:
