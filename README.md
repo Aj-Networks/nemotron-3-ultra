@@ -4,7 +4,7 @@ Run NVIDIA's **Nemotron 3 Ultra (550B)** as a coding assistant in your terminal.
 
 **Try it and [share your thoughts](https://github.com/Aj-Networks/nemotron-3-ultra/issues).**
 
-Prefer a visual walkthrough? Open the [step-by-step guide](website/index.html) (download the repo, then open `website/index.html` in your browser).
+**[Open the step-by-step guide](https://aj-networks.github.io/nemotron-3-ultra/)** for a visual walkthrough.
 
 ## Quick start
 
