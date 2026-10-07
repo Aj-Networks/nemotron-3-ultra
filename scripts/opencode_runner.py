@@ -12,6 +12,7 @@ import shutil
 import subprocess
 import argparse
 from pathlib import Path
+from typing import Dict
 
 ROOT = Path(__file__).parent.parent
 
