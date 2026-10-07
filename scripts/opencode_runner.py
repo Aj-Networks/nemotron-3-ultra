@@ -8,6 +8,7 @@ Use as: python scripts/opencode_runner.py [project] [--verify-only] [--skip-phas
 import os
 import sys
 import json
+import shutil
 import subprocess
 import argparse
 from pathlib import Path
@@ -86,7 +87,7 @@ class OpenCodeRunner:
 
         # Launch OpenCode
         try:
-            result = subprocess.run(["opencode"], env=env)
+            result = subprocess.run([shutil.which("opencode") or "opencode"], env=env)
             return result.returncode
         except KeyboardInterrupt:
             print("\nOpenCode interrupted.")

@@ -7,6 +7,7 @@ Run this before any OpenCode session to ensure environment is correct.
 import os
 import sys
 import json
+import shutil
 import subprocess
 from pathlib import Path
 from typing import Dict, List, Tuple
@@ -38,7 +39,7 @@ class Phase1Verifier:
 
     def check_opencode(self) -> bool:
         try:
-            result = subprocess.run(["opencode", "--version"], capture_output=True, text=True)
+            result = subprocess.run([shutil.which("opencode") or "opencode", "--version"], capture_output=True, text=True)
             if result.returncode != 0:
                 self.errors.append("OpenCode not installed or not in PATH")
                 return False
