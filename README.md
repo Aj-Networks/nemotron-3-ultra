@@ -1,6 +1,6 @@
 # Nemotron 3 Ultra + OpenCode
 
-Run NVIDIA's **Nemotron 3 Ultra (550B)** as a coding assistant in your terminal. Free API, no GPU, no credit card.
+Run NVIDIA's **Nemotron 3 Ultra (550B)** as a coding assistant in your terminal. Free API, no GPU, no credit card. Tested on Windows 11 and macOS.
 
 **Try it and share your thoughts** (Reddit thread: coming soon)
 
