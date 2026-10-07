@@ -1,41 +1,24 @@
 # Contributing
 
-## Quick Rules
+Thanks for trying it. Right now, feedback helps most.
 
-1. **No em-dashes**: Use periods, colons, parentheses, or "and"
-2. **Blunt, short wording**: Solution first, education second
-3. **Test before commit**: Run lint/typecheck if available
-4. **Never commit secrets**: API keys, tokens, passwords
+## Feedback
 
-## Workflow
+[Open an issue](https://github.com/Aj-Networks/nemotron-3-ultra/issues) with: what you tried, what happened, your OS.
 
-1. Fork the repo
-2. Create a feature branch: `git checkout -b feat/your-feature`
-3. Make changes (follow existing code style)
-4. Verify: run setup scripts, test memory manager
-5. Commit with imperative message: `add rate limiter config`
-6. Push and open PR
+## Pull requests
 
-## Code Style
+1. Fork and create a branch
+2. Keep the change small and focused
+3. Test the setup script on your OS
+4. Open a PR with a one-line summary
 
-- Python: type hints, docstrings, 4-space indent
-- PowerShell: PascalCase functions, comment-based help
-- Bash: lowercase functions, `set -euo pipefail`
-- JSON: 2-space indent, trailing commas where valid
-- Markdown: no em-dashes, concise sentences
+## Rules
 
-## Areas Welcome
+- No secrets or real API keys
+- Cite a source for any model spec or limit
+- Short, plain wording (no em-dashes)
 
-- Additional provider configs (OpenRouter, local vLLM, etc.)
-- More memory/cache backends (SQLite, Redis, PostgreSQL)
-- Additional monitoring dashboards
-- Windows/macOS/Linux setup improvements
-- Documentation translations
-- Screenshot contributions for website
+## Ideas welcome
 
-## Not Accepted
-
-- Changes to model IDs or technical specs without source
-- Em-dashes in any file
-- Secrets or real API keys
-- Breaking changes without version bump
+Provider configs, memory backends (SQLite, Redis), dashboards, setup fixes, translations.
