@@ -1,392 +1,564 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Nemotron 3 Ultra + OpenCode Setup Guide</title>
-    <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; line-height: 1.6; color: #1a1a1a; background: #fafafa; }
-        .container { max-width: 900px; margin: 0 auto; padding: 2rem; }
-        header { text-align: center; margin-bottom: 3rem; padding: 2rem 0; border-bottom: 1px solid #e0e0e0; }
-        h1 { font-size: 2.5rem; color: #76b900; margin-bottom: 0.5rem; }
-        .subtitle { color: #666; font-size: 1.1rem; }
-        .step { background: white; border-radius: 8px; padding: 2rem; margin-bottom: 1.5rem; box-shadow: 0 2px 8px rgba(0,0,0,0.05); border: 1px solid #e8e8e8; }
-        .step-number { display: inline-block; background: #76b900; color: white; width: 32px; height: 32px; border-radius: 50%; text-align: center; line-height: 32px; font-weight: bold; margin-bottom: 1rem; }
-        .step h2 { color: #333; margin-bottom: 1rem; }
-        .step p { color: #444; margin-bottom: 1rem; }
-        .code-block { background: #1e1e1e; color: #d4d4d4; padding: 1rem; border-radius: 6px; overflow-x: auto; font-family: 'Monaco', 'Consolas', monospace; font-size: 0.9rem; margin: 1rem 0; }
-        .code-block .comment { color: #6a9955; }
-        .code-block .keyword { color: #569cd6; }
-        .code-block .string { color: #ce9178; }
-        .screenshot { max-width: 100%; border-radius: 6px; border: 1px solid #e0e0e0; margin: 1rem 0; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
-        .badge { display: inline-block; padding: 0.25rem 0.75rem; border-radius: 999px; font-size: 0.75rem; font-weight: 600; margin-right: 0.5rem; }
-        .badge-free { background: #d4edda; color: #155724; }
-        .badge-api { background: #cce5ff; color: #004085; }
-        .badge-local { background: #f8d7da; color: #721c24; }
-        .checklist { list-style: none; }
-        .checklist li { padding: 0.5rem 0; padding-left: 2rem; position: relative; }
-        .checklist li::before { content: "✓"; position: absolute; left: 0; color: #76b900; font-weight: bold; }
-        .tabs { display: flex; border-bottom: 2px solid #e0e0e0; margin-bottom: 1rem; }
-        .tab { padding: 0.75rem 1.5rem; cursor: pointer; border-bottom: 2px solid transparent; margin-bottom: -2px; font-weight: 500; color: #666; }
-        .tab.active { color: #76b900; border-bottom-color: #76b900; }
-        .tab-content { display: none; }
-        .tab-content.active { display: block; animation: fadeIn 0.2s; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
-        .limit-card { background: #fff3cd; border: 1px solid #ffeeba; border-radius: 6px; padding: 1rem; margin: 1rem 0; }
-        .limit-card h4 { color: #856404; margin-bottom: 0.5rem; }
-        footer { text-align: center; padding: 2rem; color: #999; font-size: 0.9rem; }
-        .architecture { display: flex; justify-content: center; align-items: center; gap: 1rem; flex-wrap: wrap; margin: 1.5rem 0; }
-        .arch-box { background: white; border: 2px solid #76b900; border-radius: 8px; padding: 1rem 1.5rem; text-align: center; min-width: 180px; }
-        .arch-arrow { color: #76b900; font-size: 1.5rem; }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Nemotron 3 Ultra + OpenCode Setup Guide</title>
+<meta name="description" content="Step-by-step guide to run NVIDIA Nemotron 3 Ultra as a free coding assistant in your terminal with OpenCode.">
+<style>
+  :root {
+    --bg: #f6f8fa;
+    --surface: #ffffff;
+    --border: #d8dee4;
+    --text: #1f2328;
+    --muted: #59636e;
+    --accent: #0b5cad;
+    --accent-soft: #e8f1fb;
+    --ok: #1a7f37;
+    --ok-soft: #e6f4ea;
+    --bad: #c62828;
+    --bad-soft: #fdecea;
+    --warn: #9a6700;
+    --warn-soft: #fff8e1;
+    --code-bg: #0d1117;
+    --code-text: #e6edf3;
+    --radius: 10px;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #0d1117;
+      --surface: #161b22;
+      --border: #30363d;
+      --text: #e6edf3;
+      --muted: #9198a1;
+      --accent: #4493f8;
+      --accent-soft: #10243e;
+      --ok: #3fb950;
+      --ok-soft: #12261b;
+      --bad: #f85149;
+      --bad-soft: #2d1416;
+      --warn: #d29922;
+      --warn-soft: #2a2110;
+      --code-bg: #010409;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #0d1117; --surface: #161b22; --border: #30363d; --text: #e6edf3; --muted: #9198a1;
+    --accent: #4493f8; --accent-soft: #10243e; --ok: #3fb950; --ok-soft: #12261b;
+    --bad: #f85149; --bad-soft: #2d1416; --warn: #d29922; --warn-soft: #2a2110; --code-bg: #010409;
+  }
+
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    font-size: 16px;
+    line-height: 1.6;
+  }
+  a { color: var(--accent); }
+  code {
+    font-family: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", monospace;
+    font-size: 0.9em;
+    background: var(--accent-soft);
+    padding: 0.1em 0.35em;
+    border-radius: 4px;
+  }
+
+  /* Top bar */
+  .topbar {
+    position: sticky; top: 0; z-index: 20;
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+  }
+  .topbar-inner {
+    max-width: 1180px; margin: 0 auto; padding: 10px 16px;
+    display: flex; align-items: center; gap: 16px;
+  }
+  .brand { font-weight: 600; white-space: nowrap; }
+  .progress-wrap { flex: 1; display: flex; align-items: center; gap: 10px; min-width: 0; }
+  .progress { flex: 1; height: 8px; background: var(--border); border-radius: 99px; overflow: hidden; }
+  .progress-bar { height: 100%; width: 0; background: var(--ok); transition: width 0.3s; }
+  .progress-label { font-size: 0.85em; color: var(--muted); white-space: nowrap; }
+  .btn {
+    font: inherit; font-size: 0.9em;
+    border: 1px solid var(--border); background: var(--surface); color: var(--text);
+    padding: 6px 12px; border-radius: 6px; cursor: pointer; white-space: nowrap;
+  }
+  .btn:hover { border-color: var(--accent); color: var(--accent); }
+  .btn-primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .btn-primary:hover { color: #fff; opacity: 0.9; }
+
+  /* Layout */
+  .layout {
+    max-width: 1180px; margin: 0 auto; padding: 24px 16px 64px;
+    display: grid; grid-template-columns: 240px 1fr; gap: 32px;
+  }
+  .sidebar { position: sticky; top: 72px; align-self: start; }
+  .sidebar h4 { margin: 0 0 8px; font-size: 0.75em; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); }
+  .nav { list-style: none; margin: 0; padding: 0; }
+  .nav a {
+    display: flex; align-items: center; gap: 10px;
+    padding: 7px 10px; border-radius: 6px;
+    color: var(--text); text-decoration: none; font-size: 0.92em;
+  }
+  .nav a:hover { background: var(--accent-soft); }
+  .nav a.active { background: var(--accent-soft); color: var(--accent); font-weight: 600; }
+  .nav .dot {
+    flex: none; width: 22px; height: 22px; border-radius: 50%;
+    border: 2px solid var(--border); font-size: 0.75em;
+    display: grid; place-items: center; color: var(--muted);
+  }
+  .nav a.done .dot { background: var(--ok); border-color: var(--ok); color: #fff; }
+
+  /* Content */
+  main { min-width: 0; }
+  .hero {
+    background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
+    padding: 28px; margin-bottom: 24px;
+  }
+  .hero h1 { margin: 0 0 8px; font-size: 1.9em; line-height: 1.25; }
+  .hero p { margin: 0 0 16px; color: var(--muted); }
+  .meta { display: flex; flex-wrap: wrap; gap: 8px; }
+  .chip {
+    font-size: 0.85em; padding: 4px 10px; border-radius: 99px;
+    background: var(--accent-soft); color: var(--accent);
+  }
+  .os-switch { display: inline-flex; border: 1px solid var(--border); border-radius: 8px; overflow: hidden; margin-top: 16px; }
+  .os-switch button {
+    font: inherit; font-size: 0.9em; border: 0; background: var(--surface); color: var(--text);
+    padding: 7px 14px; cursor: pointer;
+  }
+  .os-switch button + button { border-left: 1px solid var(--border); }
+  .os-switch button.active { background: var(--accent); color: #fff; }
+
+  .card {
+    background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
+    padding: 24px 28px; margin-bottom: 24px; scroll-margin-top: 80px;
+  }
+  .card.done { border-color: var(--ok); }
+  .card-head { display: flex; align-items: center; gap: 12px; margin-bottom: 4px; }
+  .num {
+    flex: none; width: 34px; height: 34px; border-radius: 50%;
+    background: var(--accent); color: #fff; font-weight: 600;
+    display: grid; place-items: center;
+  }
+  .card.done .num { background: var(--ok); }
+  .card h2 { margin: 0; font-size: 1.3em; }
+  .goal { color: var(--muted); margin: 0 0 16px 46px; }
+  .card h3 { font-size: 1em; margin: 20px 0 8px; }
+  ol.actions { padding-left: 1.3em; margin: 0 0 12px; }
+  ol.actions li { margin-bottom: 6px; }
+
+  /* Code */
+  .code {
+    position: relative; background: var(--code-bg); color: var(--code-text);
+    border-radius: 8px; margin: 8px 0 14px;
+  }
+  .code pre {
+    margin: 0; padding: 14px 16px; padding-right: 76px; overflow-x: auto;
+    font-family: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", monospace; font-size: 0.88em;
+    white-space: pre;
+  }
+  .code .label {
+    display: block; padding: 6px 16px 0; font-size: 0.75em; color: #8b949e;
+  }
+  .copy {
+    position: absolute; top: 8px; right: 8px;
+    font: inherit; font-size: 0.78em; padding: 4px 10px; border-radius: 6px; cursor: pointer;
+    background: #21262d; color: #e6edf3; border: 1px solid #30363d;
+  }
+  .copy:hover { border-color: #8b949e; }
+
+  /* Screenshots */
+  figure { margin: 16px 0; }
+  figure img {
+    width: 100%; height: auto; display: block;
+    border: 1px solid var(--border); border-radius: 8px; cursor: zoom-in;
+  }
+  figcaption { font-size: 0.85em; color: var(--muted); margin-top: 6px; }
+
+  /* Callouts */
+  .dodont { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 16px 0; }
+  .callout { border-radius: 8px; padding: 12px 14px; font-size: 0.93em; }
+  .callout strong { display: block; margin-bottom: 4px; }
+  .callout ul { margin: 0; padding-left: 1.1em; }
+  .do { background: var(--ok-soft); border-left: 4px solid var(--ok); }
+  .dont { background: var(--bad-soft); border-left: 4px solid var(--bad); }
+  .note { background: var(--warn-soft); border-left: 4px solid var(--warn); margin: 12px 0; }
+  .check { background: var(--accent-soft); border-left: 4px solid var(--accent); margin: 12px 0; }
+
+  .card-foot { display: flex; justify-content: flex-end; margin-top: 18px; }
+  .mark { min-width: 170px; }
+  .card.done .mark { background: var(--ok); border-color: var(--ok); color: #fff; }
+
+  table { width: 100%; border-collapse: collapse; font-size: 0.92em; }
+  th, td { text-align: left; padding: 9px 10px; border-bottom: 1px solid var(--border); vertical-align: top; }
+  th { color: var(--muted); font-weight: 600; }
+  .table-wrap { overflow-x: auto; }
+
+  [data-os] { display: none; }
+  body.os-win [data-os="win"], body.os-unix [data-os="unix"] { display: revert; }
+
+  /* Lightbox */
+  .lightbox {
+    position: fixed; inset: 0; z-index: 50; background: rgba(0,0,0,0.85);
+    display: none; align-items: center; justify-content: center; padding: 24px; cursor: zoom-out;
+  }
+  .lightbox.open { display: flex; }
+  .lightbox img { max-width: 100%; max-height: 100%; border-radius: 6px; }
+
+  footer { color: var(--muted); font-size: 0.85em; text-align: center; padding: 8px 16px 32px; }
+
+  @media (max-width: 860px) {
+    .layout { grid-template-columns: 1fr; }
+    .sidebar { display: none; }
+    .brand { display: none; }
+    .dodont { grid-template-columns: 1fr; }
+    .card { padding: 20px 16px; }
+    .hero { padding: 20px 16px; }
+    .goal { margin-left: 0; }
+  }
+
+  @media print {
+    .topbar, .sidebar, .copy, .card-foot, .os-switch, .lightbox { display: none !important; }
+    body { background: #fff; color: #000; }
+    .layout { display: block; padding: 0; }
+    .card, .hero { border: 1px solid #ccc; break-inside: avoid-page; }
+    figure { break-inside: avoid; }
+    .code { background: #f3f3f3; color: #000; }
+    [data-os] { display: revert !important; }
+    a { color: #000; }
+  }
+</style>
 </head>
-<body>
-    <div class="container">
-        <header>
-            <h1>Nemotron 3 Ultra + OpenCode</h1>
-            <p class="subtitle">Run NVIDIA's 550B parameter MoE model in your terminal for free</p>
-            <div style="margin-top: 1rem;">
-                <span class="badge badge-free">Free API Tier</span>
-                <span class="badge badge-api">OpenAI Compatible</span>
-                <span class="badge badge-local">No GPU Required</span>
-            </div>
-        </header>
+<body class="os-win">
 
-        <div class="architecture">
-            <div class="arch-box">
-                <strong>Your Machine</strong><br>
-                <small>OpenCode Terminal</small>
-            </div>
-            <div class="arch-arrow">→</div>
-            <div class="arch-box">
-                <strong>NVIDIA API</strong><br>
-                <small>build.nvidia.com</small>
-            </div>
-            <div class="arch-arrow">→</div>
-            <div class="arch-box">
-                <strong>Nemotron 3 Ultra</strong><br>
-                <small>550B / 55B Active</small>
-            </div>
-        </div>
-
-        <!-- Step 1: Requirements -->
-        <div class="step">
-            <div class="step-number">1</div>
-            <h2>Check Requirements</h2>
-            <p>Before starting, verify you have everything needed. No local GPU required: the model runs on NVIDIA's servers.</p>
-            <div class="tabs">
-                <div class="tab active" onclick="showTab('req-windows')">Windows</div>
-                <div class="tab" onclick="showTab('req-mac')">macOS</div>
-                <div class="tab" onclick="showTab('req-linux')">Linux</div>
-            </div>
-            <div id="req-windows" class="tab-content active">
-                <ul class="checklist">
-                    <li>Windows 10/11 with PowerShell</li>
-                    <li>Node.js 20+ LTS (<a href="https://nodejs.org" target="_blank">download</a>)</li>
-                    <li>Internet connection (required)</li>
-                    <li>NVIDIA account (free, <a href="https://build.nvidia.com" target="_blank">sign up</a>)</li>
-                </ul>
-                <div class="code-block"><span class="comment"># Verify Node.js version</span>
-node --version
-<span class="comment"># Should show v20.x.x or higher</span></div>
-            </div>
-            <div id="req-mac" class="tab-content">
-                <ul class="checklist">
-                    <li>macOS 12+ (Monterey or later)</li>
-                    <li>Node.js 20+ LTS (<code>brew install node</code>)</li>
-                    <li>Internet connection</li>
-                    <li>NVIDIA account (free)</li>
-                </ul>
-            </div>
-            <div id="req-linux" class="tab-content">
-                <ul class="checklist">
-                    <li>Ubuntu 20.04+ / Debian 11+ / Fedora 35+ / Arch</li>
-                    <li>Node.js 20+ LTS (<code>curl -fsSL https://deb.nodesource.com/setup_lts.x | sudo -E bash - && sudo apt-get install -y nodejs</code>)</li>
-                    <li>Internet connection</li>
-                    <li>NVIDIA account (free)</li>
-                </ul>
-            </div>
-            <div class="limit-card">
-                <h4>⚠ Not for Local Deployment</h4>
-                <p>Nemotron 3 Ultra requires datacenter hardware: 4× B200/GB200/GB300/B300 or 8× H100-80GB. This guide uses the <strong>hosted free API</strong> instead.</p>
-            </div>
-        </div>
-
-        <!-- Step 2: Install OpenCode -->
-        <div class="step">
-            <div class="step-number">2</div>
-            <h2>Install OpenCode</h2>
-            <p>OpenCode is the terminal-based AI coding agent that connects to Nemotron 3 Ultra via NVIDIA's API.</p>
-            <div class="tabs">
-                <div class="tab active" onclick="showTab('install-windows')">Windows (PowerShell)</div>
-                <div class="tab" onclick="showTab('install-unix')">macOS / Linux</div>
-            </div>
-            <div id="install-windows" class="tab-content active">
-                <div class="code-block"><span class="comment"># Install globally via npm</span>
-npm install -g opencode-ai
-
-<span class="comment"># Verify installation</span>
-opencode --version</div>
-            </div>
-            <div id="install-unix" class="tab-content">
-                <div class="code-block"><span class="comment"># Install globally via npm</span>
-npm install -g opencode-ai
-
-<span class="comment"># Verify installation</span>
-opencode --version</div>
-            </div>
-            <p><strong>What is OpenCode?</strong> A terminal-native AI agent that reads/writes files, runs commands, and uses tools: all while streaming responses from any OpenAI-compatible endpoint.</p>
-        </div>
-
-        <!-- Step 3: Get API Key -->
-        <div class="step">
-            <div class="step-number">3</div>
-            <h2>Get Your Free NVIDIA API Key</h2>
-            <p>Generate a key at <a href="https://build.nvidia.com" target="_blank">build.nvidia.com</a>. No credit card required.</p>
-            <ol style="padding-left: 1.5rem; margin: 1rem 0;">
-                <li>Sign in to <a href="https://build.nvidia.com" target="_blank">build.nvidia.com</a> with your NVIDIA account</li>
-                <li>Navigate to <strong>Nemotron 3 Ultra</strong> model page</li>
-                <li>Click <strong>Get API Key</strong> or go to <a href="https://build.nvidia.com/settings/api-keys" target="_blank">API Keys settings</a></li>
-                <li>Create a new key: copy it immediately (starts with <code>nvapi-</code>)</li>
-            </ol>
-            <img src="assets/images/step3-api-key.png" alt="NVIDIA API Key generation" class="screenshot" style="display: none;">
-            <p><em>Screenshot placeholder: Add your blurred API key screenshot here as <code>assets/images/step3-api-key.png</code></em></p>
-        </div>
-
-        <!-- Step 4: Configure -->
-        <div class="step">
-            <div class="step-number">4</div>
-            <h2>Configure OpenCode</h2>
-            <p>Create the config file that connects OpenCode to Nemotron 3 Ultra via NVIDIA's API.</p>
-            <div class="tabs">
-                <div class="tab active" onclick="showTab('config-windows')">Windows (PowerShell)</div>
-                <div class="tab" onclick="showTab('config-unix')">macOS / Linux</div>
-            </div>
-            <div id="config-windows" class="tab-content active">
-                <div class="code-block"><span class="comment"># Create config directory</span>
-New-Item -ItemType Directory -Force "$env:USERPROFILE\.config\opencode" | Out-Null
-
-<span class="comment"># Write config (uses env var, never stores key in file)</span>
-@'
-{
-  "$schema": "https://opencode.ai/config.json",
-  "model": "nvidia/nvidia/nemotron-3-ultra-550b-a55b",
-  "provider": {
-    "nvidia": {
-      "npm": "@ai-sdk/openai-compatible",
-      "name": "NVIDIA",
-      "options": {
-        "baseURL": "https://integrate.api.nvidia.com/v1",
-        "apiKey": "{env:NVIDIA_API_KEY}"
-      },
-      "models": {
-        "nvidia/nemotron-3-ultra-550b-a55b": {
-          "name": "Nemotron 3 Ultra"
-        }
-      }
-    }
-  }
-}
-'@ | Set-Content -Encoding utf8 "$env:USERPROFILE\.config\opencode\opencode.json"
-
-<span class="comment"># Set API key persistently</span>
-setx NVIDIA_API_KEY "nvapi-YOUR-KEY-HERE"
-<span class="comment"># Close and reopen PowerShell, then:</span>
-$env:NVIDIA_API_KEY = "nvapi-YOUR-KEY-HERE"</div>
-            </div>
-            <div id="config-unix" class="tab-content">
-                <div class="code-block"><span class="comment"># Create config directory</span>
-mkdir -p ~/.config/opencode
-
-<span class="comment"># Write config</span>
-cat > ~/.config/opencode/opencode.json << 'EOF'
-{
-  "$schema": "https://opencode.ai/config.json",
-  "model": "nvidia/nvidia/nemotron-3-ultra-550b-a55b",
-  "provider": {
-    "nvidia": {
-      "npm": "@ai-sdk/openai-compatible",
-      "name": "NVIDIA",
-      "options": {
-        "baseURL": "https://integrate.api.nvidia.com/v1",
-        "apiKey": "{env:NVIDIA_API_KEY}"
-      },
-      "models": {
-        "nvidia/nemotron-3-ultra-550b-a55b": {
-          "name": "Nemotron 3 Ultra"
-        }
-      }
-    }
-  }
-}
-EOF
-
-<span class="comment"># Set API key (add to ~/.bashrc or ~/.zshrc for persistence)</span>
-export NVIDIA_API_KEY="nvapi-YOUR-KEY-HERE"</div>
-            </div>
-        </div>
-
-        <!-- Step 5: Run -->
-        <div class="step">
-            <div class="step-number">5</div>
-            <h2>Run and Test</h2>
-            <p>Launch OpenCode from your project directory.</p>
-            <div class="code-block"><span class="comment"># Navigate to your project</span>
-cd C:\path\to\your\project
-
-<span class="comment"># Start OpenCode</span>
-opencode</div>
-            <p>On first run:</p>
-            <ol style="padding-left: 1.5rem; margin: 1rem 0;">
-                <li>Type <code>/models</code> and press Enter</li>
-                <li>Select <strong>Nemotron 3 Ultra (NVIDIA)</strong></li>
-                <li>Type <code>hello</code> to test</li>
-            </ol>
-            <img src="assets/images/step5-opencode-running.png" alt="OpenCode running with Nemotron 3 Ultra" class="screenshot" style="display: none;">
-            <p><em>Screenshot placeholder: Add your OpenCode terminal screenshot as <code>assets/images/step5-opencode-running.png</code></em></p>
-        </div>
-
-        <!-- Step 6: Memory & Cache -->
-        <div class="step">
-            <div class="step-number">6</div>
-            <h2>Memory, Cache & Project Isolation</h2>
-            <p>This repo includes a built-in memory and cache system for production use at scale.</p>
-            <div class="architecture">
-                <div class="arch-box">
-                    <strong>Global Memory</strong><br>
-                    <small>memory/global/MEMORY.md</small>
-                </div>
-                <div class="arch-arrow">↔</div>
-                <div class="arch-box">
-                    <strong>Project Memory</strong><br>
-                    <small>projects/<name>/MEMORY.md</small>
-                </div>
-                <div class="arch-arrow">↔</div>
-                <div class="arch-box">
-                    <strong>Cache</strong><br>
-                    <small>cache/global/ & cache/projects/</small>
-                </div>
-            </div>
-            <h3>Quick Commands</h3>
-            <div class="code-block"><span class="comment"># Initialize a new project</span>
-python scripts/memory_manager.py init my-project "My project description"
-
-<span class="comment"># List all projects</span>
-python scripts/memory_manager.py list
-
-<span class="comment"># Show system status</span>
-python scripts/memory_manager.py status
-
-<span class="comment"># Sync global memory (git pull)</span>
-python scripts/memory_manager.py sync</div>
-            <h3>Folder Structure</h3>
-            <pre style="background: #f5f5f5; padding: 1rem; border-radius: 6px; font-size: 0.85rem;">nemotron-3-ultra/
-├── memory/
-│   └── global/
-│       └── MEMORY.md          # Shared across all projects
-├── cache/
-│   ├── global/                # Shared cache entries
-│   └── projects/
-│       └── <name>/            # Per-project cache
-├── projects/
-│   └── <name>/
-│       ├── MEMORY.md          # Project-specific memory
-│       ├── input/             # Your input files
-│       ├── output/            # Generated outputs
-│       └── cache/             # Project cache
-├── scripts/
-│   ├── memory_manager.py      # Memory/cache CLI
-│   ├── setup-windows.ps1      # Windows automated setup
-│   └── setup-unix.sh          # macOS/Linux automated setup
-├── docs/
-│   ├── 00-limitations.md      # Official model limits
-│   ├── 01-requirements.md
-│   ├── 02-install-opencode.md
-│   ├── 03-get-nvidia-api-key.md
-│   ├── 04-configure-opencode.md
-│   ├── 05-troubleshooting.md
-│   └── 06-security-and-costs.md
-├── examples/
-│   └── opencode.example.json  # Config template
-└── website/
-    └── index.html             # This page</pre>
-        </div>
-
-        <!-- Limitations -->
-        <div class="step">
-            <div class="step-number">7</div>
-            <h2>Official Limitations (Free API Tier)</h2>
-            <p>Key constraints from NVIDIA's model card for <code>nvidia/nemotron-3-ultra-550b-a55b</code>:</p>
-            <div class="limit-card">
-                <h4>Free Tier Limits</h4>
-                <ul style="padding-left: 1.5rem;">
-                    <li><strong>Rate limits:</strong> Not published. Expect ~10-20 req/min, ~50k-100k tokens/min</li>
-                    <li><strong>Daily quota:</strong> Not published. Resets on 429 errors</li>
-                    <li><strong>No SLA:</strong> Free tier can be throttled or disabled anytime</li>
-                    <li><strong>Logging:</strong> NVIDIA logs usage for security/product improvement</li>
-                    <li><strong>Context:</strong> Up to 1M tokens (API may enforce lower)</li>
-                    <li><strong>Concurrent:</strong> Limited (single-digit typically)</li>
-                </ul>
-            </div>
-            <div class="limit-card">
-                <h4>Model Capabilities</h4>
-                <ul style="padding-left: 1.5rem;">
-                    <li><strong>550B total / 55B active</strong> (LatentMoE: Mamba-2 + MoE + Attention)</li>
-                    <li><strong>1M token context</strong> (requires chunked prefill)</li>
-                    <li><strong>12 languages:</strong> EN, FR, ES, IT, DE, JA, KO, HI, PT, ZH</li>
-                    <li><strong>Reasoning:</strong> Configurable via <code>enable_thinking: true/false</code></li>
-                    <li><strong>Benchmarks:</strong> SWE-Bench 69.7% (NVFP4), GPQA 87.9%, RULER 1M 94.0%</li>
-                </ul>
-            </div>
-            <div class="limit-card">
-                <h4>Production at Scale (Millions of Users)</h4>
-                <ul style="padding-left: 1.5rem;">
-                    <li>Free tier <strong>not suitable</strong> for high-volume production</li>
-                    <li>Self-host: 4× B200 (~$12-16/hr cloud) or 8× H100 (~$24-32/hr)</li>
-                    <li>Implement: token-bucket rate limiter, exponential backoff, semantic cache</li>
-                    <li>Fallback: OpenRouter <code>nvidia/nemotron-3-ultra-550b-a55b:free</code></li>
-                    <li>Set <code>reasoning_budget: 512-1024</code> for cost/latency control</li>
-                </ul>
-            </div>
-            <p><a href="docs/00-limitations.md">Full limitations documentation →</a></p>
-        </div>
-
-        <!-- Automated Setup -->
-        <div class="step">
-            <div class="step-number">🚀</div>
-            <h2>Automated Setup (Recommended)</h2>
-            <p>Use the provided scripts for one-command setup.</p>
-            <div class="tabs">
-                <div class="tab active" onclick="showTab('auto-windows')">Windows</div>
-                <div class="tab" onclick="showTab('auto-unix')">macOS / Linux</div>
-            </div>
-            <div id="auto-windows" class="tab-content active">
-                <div class="code-block"><span class="comment"># Run in PowerShell (from repo root)</span>
-.\scripts\setup-windows.ps1 -ProjectName my-app</div>
-                <p>This script: checks Node.js, installs OpenCode, securely prompts for API key, sets env var, writes config, initializes project memory.</p>
-            </div>
-            <div id="auto-unix" class="tab-content">
-                <div class="code-block"><span class="comment"># Make executable and run</span>
-chmod +x scripts/setup-unix.sh
-./scripts/setup-unix.sh my-app</div>
-                <p>Same features as Windows script, for bash/zsh.</p>
-            </div>
-        </div>
-
-        <footer>
-            <p>Nemotron 3 Ultra + OpenCode Setup Guide | <a href="https://github.com/nvidia/nemotron" target="_blank">Official Model</a> | <a href="https://opencode.ai" target="_blank">OpenCode</a> | <a href="https://build.nvidia.com" target="_blank">Free API</a></p>
-            <p>Not affiliated with NVIDIA or OpenCode. Free tier terms and limits can change.</p>
-        </footer>
+<header class="topbar">
+  <div class="topbar-inner">
+    <div class="brand">Nemotron 3 Ultra + OpenCode</div>
+    <div class="progress-wrap">
+      <div class="progress"><div class="progress-bar" id="bar"></div></div>
+      <span class="progress-label" id="barLabel">0 of 6 steps</span>
     </div>
+    <button class="btn" onclick="window.print()">Save as PDF</button>
+    <button class="btn" id="themeBtn" aria-label="Toggle dark and light mode">🌙 Dark</button>
+  </div>
+</header>
 
-    <script>
-        function showTab(id) {
-            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-            event.target.classList.add('active');
-            document.getElementById(id).classList.add('active');
-        }
-    </script>
+<div class="layout">
+  <aside class="sidebar">
+    <h4>Steps</h4>
+    <ul class="nav" id="nav">
+      <li><a href="#before"><span class="dot">✓</span>Before you start</a></li>
+      <li><a href="#step-1" data-step="1"><span class="dot">1</span>Check Node.js and Python</a></li>
+      <li><a href="#step-2" data-step="2"><span class="dot">2</span>Install OpenCode</a></li>
+      <li><a href="#step-3" data-step="3"><span class="dot">3</span>Get your API key</a></li>
+      <li><a href="#step-4" data-step="4"><span class="dot">4</span>Run the setup</a></li>
+      <li><a href="#step-5" data-step="5"><span class="dot">5</span>Verify everything</a></li>
+      <li><a href="#step-6" data-step="6"><span class="dot">6</span>Start coding</a></li>
+      <li><a href="#trouble"><span class="dot">?</span>Troubleshooting</a></li>
+      <li><a href="#finish"><span class="dot">★</span>Finish</a></li>
+    </ul>
+  </aside>
+
+  <main>
+    <section class="hero">
+      <h1>Run Nemotron 3 Ultra as your coding assistant</h1>
+      <p>Use NVIDIA's 550B model in your terminal through OpenCode. Free API, no GPU, no credit card.</p>
+      <div class="meta">
+        <span class="chip">About 15 minutes</span>
+        <span class="chip">Beginner friendly</span>
+        <span class="chip">Windows, macOS, Linux</span>
+      </div>
+      <div class="os-switch" role="tablist" aria-label="Operating system">
+        <button class="active" data-set-os="win">Windows</button>
+        <button data-set-os="unix">macOS / Linux</button>
+      </div>
+    </section>
+
+    <!-- Before you start -->
+    <section class="card" id="before">
+      <div class="card-head"><h2>Before you start</h2></div>
+      <p>Have these ready:</p>
+      <ul>
+        <li>A Windows, macOS, or Linux computer with internet</li>
+        <li><a href="https://nodejs.org" target="_blank" rel="noopener">Node.js LTS</a> and <a href="https://www.python.org/downloads/" target="_blank" rel="noopener">Python 3</a></li>
+        <li>A free <a href="https://build.nvidia.com" target="_blank" rel="noopener">NVIDIA account</a></li>
+      </ul>
+      <div class="callout note"><strong>Privacy</strong>NVIDIA logs free-tier usage. Do not send confidential code or personal data.</div>
+    </section>
+
+    <!-- Step 1 -->
+    <section class="card" id="step-1" data-step="1">
+      <div class="card-head"><span class="num">1</span><h2>Check Node.js and Python</h2></div>
+      <p class="goal">Confirm both tools are installed.</p>
+      <ol class="actions">
+        <li data-os="win">Open <strong>PowerShell</strong> (Start menu, type <code>PowerShell</code>).</li>
+        <li data-os="unix">Open <strong>Terminal</strong>.</li>
+        <li>Run both commands:</li>
+      </ol>
+      <div class="code" data-os="win"><pre>node -v
+python --version</pre><button class="copy">Copy</button></div>
+      <div class="code" data-os="unix"><pre>node -v
+python3 --version</pre><button class="copy">Copy</button></div>
+      <figure>
+        <img src="assets/images/01-node-version.png" alt="PowerShell showing node and python versions" loading="lazy">
+        <figcaption>Both commands print a version number.</figcaption>
+      </figure>
+      <div class="callout check"><strong>It worked if</strong>You see a version for each, for example <code>v22.x</code> and <code>Python 3.x</code>.</div>
+      <div class="dodont">
+        <div class="callout do"><strong>✅ Do</strong><ul><li>Install the LTS version of Node.js</li><li>Tick "Add Python to PATH" in the Python installer</li></ul></div>
+        <div class="callout dont"><strong>❌ Don't</strong><ul><li>Continue if either command says "not recognized"</li></ul></div>
+      </div>
+      <div class="card-foot"><button class="btn mark" data-mark="1">Mark step complete</button></div>
+    </section>
+
+    <!-- Step 2 -->
+    <section class="card" id="step-2" data-step="2">
+      <div class="card-head"><span class="num">2</span><h2>Install OpenCode</h2></div>
+      <p class="goal">Install the terminal app that talks to the model.</p>
+      <div class="code"><pre>npm i -g opencode-ai
+opencode --version</pre><button class="copy">Copy</button></div>
+      <figure>
+        <img src="assets/images/02-opencode-install.png" alt="OpenCode installed and version shown" loading="lazy">
+        <figcaption>OpenCode installed and printing its version.</figcaption>
+      </figure>
+      <div class="callout check"><strong>It worked if</strong><code>opencode --version</code> prints a number such as <code>1.18.35</code>.</div>
+      <div class="callout note"><strong>Optional</strong>The setup script in step 4 also installs OpenCode. Doing it here just confirms npm works.</div>
+      <div class="card-foot"><button class="btn mark" data-mark="2">Mark step complete</button></div>
+    </section>
+
+    <!-- Step 3 -->
+    <section class="card" id="step-3" data-step="3">
+      <div class="card-head"><span class="num">3</span><h2>Get your free NVIDIA API key</h2></div>
+      <p class="goal">Create the key that lets OpenCode use the model.</p>
+      <ol class="actions">
+        <li>Go to <a href="https://build.nvidia.com" target="_blank" rel="noopener">build.nvidia.com</a> and sign in (create a free account if needed).</li>
+        <li>In the search box, type <code>nemotron-3-ultra-550b-a55b</code> and open <strong>nvidia/nemotron-3-ultra-550b-a55b</strong>.</li>
+      </ol>
+      <figure>
+        <img src="assets/images/03-nvidia-key-1.png" alt="Searching for nemotron-3-ultra-550b-a55b on build.nvidia.com" loading="lazy">
+        <figcaption>Search for the model on the build.nvidia.com home page.</figcaption>
+      </figure>
+      <ol class="actions" start="3">
+        <li>On the <strong>Build</strong> tab, click <strong>Generate API Key</strong>.</li>
+        <li>Copy the full key. It starts with <code>nvapi-</code>.</li>
+      </ol>
+      <figure>
+        <img src="assets/images/03-nvidia-key-2.png" alt="Model page with Generate API Key button" loading="lazy">
+        <figcaption>The Generate API Key button is at the top right of the code box. Key blurred.</figcaption>
+      </figure>
+      <div class="dodont">
+        <div class="callout do"><strong>✅ Do</strong><ul><li>Copy the whole key, including <code>nvapi-</code></li><li>Keep it somewhere private</li></ul></div>
+        <div class="callout dont"><strong>❌ Don't</strong><ul><li>Share the key or post it in screenshots</li><li>Paste it into any file you commit</li></ul></div>
+      </div>
+      <div class="card-foot"><button class="btn mark" data-mark="3">Mark step complete</button></div>
+    </section>
+
+    <!-- Step 4 -->
+    <section class="card" id="step-4" data-step="4">
+      <div class="card-head"><span class="num">4</span><h2>Download the repo and run the setup</h2></div>
+      <p class="goal">One script installs OpenCode, saves your key, and writes the config.</p>
+      <h3>Download</h3>
+      <div class="code"><pre>git clone https://github.com/Aj-Networks/nemotron-3-ultra.git
+cd nemotron-3-ultra</pre><button class="copy">Copy</button></div>
+      <p>No git? Use <a href="https://github.com/Aj-Networks/nemotron-3-ultra/archive/refs/heads/main.zip">Download ZIP</a>, extract it, and open the folder in your terminal.</p>
+      <h3>Run the setup</h3>
+      <div data-os="win">
+        <div class="code"><pre>powershell -ExecutionPolicy Bypass -File .\scripts\setup-windows.ps1 -ProjectName my-project</pre><button class="copy">Copy</button></div>
+      </div>
+      <div data-os="unix">
+        <div class="code"><pre>chmod +x scripts/setup-unix.sh
+./scripts/setup-unix.sh my-project</pre><button class="copy">Copy</button></div>
+      </div>
+      <p>When asked, paste your API key and press Enter.</p>
+      <figure>
+        <img src="assets/images/04-setup-script.png" alt="Setup script installing OpenCode and asking for the API key" loading="lazy">
+        <figcaption>The script installs OpenCode, then asks for your key.</figcaption>
+      </figure>
+      <div class="dodont">
+        <div class="callout do"><strong>✅ Do</strong><ul>
+          <li data-os="win">Use <strong>PowerShell</strong></li>
+          <li>Close and reopen the terminal after setup so the key loads</li>
+        </ul></div>
+        <div class="callout dont"><strong>❌ Don't</strong><ul>
+          <li data-os="win">Run it in Git Bash or CMD. It will fail with "command not found".</li>
+          <li>Skip reopening the terminal</li>
+        </ul></div>
+      </div>
+      <div class="card-foot"><button class="btn mark" data-mark="4">Mark step complete</button></div>
+    </section>
+
+    <!-- Step 5 -->
+    <section class="card" id="step-5" data-step="5">
+      <div class="card-head"><span class="num">5</span><h2>Verify everything</h2></div>
+      <p class="goal">Run all checks without opening OpenCode.</p>
+      <ol class="actions">
+        <li>Open a <strong>new</strong> terminal.</li>
+        <li>Go to the repo folder, then run the checks:</li>
+      </ol>
+      <div class="code" data-os="win"><pre>cd path\to\nemotron-3-ultra
+python scripts/opencode_runner.py my-project --verify-only</pre><button class="copy">Copy</button></div>
+      <div class="code" data-os="unix"><pre>cd path/to/nemotron-3-ultra
+python3 scripts/opencode_runner.py my-project --verify-only</pre><button class="copy">Copy</button></div>
+      <figure>
+        <img src="assets/images/05-phase-checks.png" alt="All Phase 1 to 3 checks passing" loading="lazy">
+        <figcaption>Phase 1 checks your setup, Phase 2 loads memory, Phase 3 tests reply checking.</figcaption>
+      </figure>
+      <div class="callout check"><strong>It worked if</strong>Every line says <code>PASS</code> and the last line says <code>All phases complete</code>.</div>
+      <div class="callout note"><strong>New terminal, new folder</strong>Every new terminal starts in your home folder. Always <code>cd</code> into the repo first.</div>
+      <div class="card-foot"><button class="btn mark" data-mark="5">Mark step complete</button></div>
+    </section>
+
+    <!-- Step 6 -->
+    <section class="card" id="step-6" data-step="6">
+      <div class="card-head"><span class="num">6</span><h2>Start coding</h2></div>
+      <p class="goal">Launch OpenCode with Nemotron 3 Ultra.</p>
+      <div class="code" data-os="win"><pre>python scripts/opencode_runner.py my-project</pre><button class="copy">Copy</button></div>
+      <div class="code" data-os="unix"><pre>python3 scripts/opencode_runner.py my-project</pre><button class="copy">Copy</button></div>
+      <ol class="actions">
+        <li>Check the bottom bar shows <strong>Nemotron 3 Ultra</strong>. If not, type <code>/models</code> inside OpenCode and pick it.</li>
+        <li>Try a first prompt:</li>
+      </ol>
+      <div class="code"><pre>explain what this repo does in 3 bullet points</pre><button class="copy">Copy</button></div>
+      <figure>
+        <img src="assets/images/06-opencode-running.png" alt="OpenCode answering a prompt with Nemotron 3 Ultra" loading="lazy">
+        <figcaption>Nemotron 3 Ultra answering inside OpenCode. The cost shown ($0.03) is OpenCode's own estimate. NVIDIA's free tier does not charge you.</figcaption>
+      </figure>
+      <div class="dodont">
+        <div class="callout do"><strong>✅ Do</strong><ul><li>Type <code>/</code> commands inside OpenCode, not in the terminal</li><li>Exit with <code>Ctrl+C</code> or <code>/exit</code></li></ul></div>
+        <div class="callout dont"><strong>❌ Don't</strong><ul><li>Send passwords, keys, or private data</li><li>Fire many requests at once (free tier limit is about 10 to 20 per minute)</li></ul></div>
+      </div>
+      <div class="card-foot"><button class="btn mark" data-mark="6">Mark step complete</button></div>
+    </section>
+
+    <!-- Troubleshooting -->
+    <section class="card" id="trouble">
+      <div class="card-head"><h2>Troubleshooting</h2></div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Problem</th><th>Fix</th></tr></thead>
+          <tbody>
+            <tr><td><code>command not found</code> for a <code>.ps1</code> script</td><td>You are in Git Bash. Open PowerShell and use the step 4 command.</td></tr>
+            <tr><td><code>can't open file ... scripts\...</code></td><td>Wrong folder. <code>cd</code> into the repo first.</td></tr>
+            <tr><td><code>opencode</code> is not recognized</td><td>Close and reopen the terminal.</td></tr>
+            <tr><td><code>401 Unauthorized</code></td><td>Key not loaded. Reopen the terminal, or rerun the setup.</td></tr>
+            <tr><td><code>403 Forbidden</code></td><td>Key invalid or revoked. Generate a new one (step 3).</td></tr>
+            <tr><td><code>429 Too Many Requests</code></td><td>Free tier limit reached. Wait a few minutes.</td></tr>
+            <tr><td><code>/models</code> not recognized</td><td>You typed it in the terminal. Start OpenCode first (step 6).</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p>More in the <a href="https://github.com/Aj-Networks/nemotron-3-ultra/blob/main/docs/05-troubleshooting.md" target="_blank" rel="noopener">full troubleshooting guide</a>.</p>
+    </section>
+
+    <!-- Finish -->
+    <section class="card" id="finish">
+      <div class="card-head"><h2>You're set up</h2></div>
+      <p>Nemotron 3 Ultra is now your coding assistant. Next time, just run step 6.</p>
+      <ul>
+        <li><strong>Share your thoughts:</strong> Reddit thread coming soon</li>
+        <li><strong>Found a bug?</strong> <a href="https://github.com/Aj-Networks/nemotron-3-ultra/issues" target="_blank" rel="noopener">Open an issue</a></li>
+        <li><strong>Source:</strong> <a href="https://github.com/Aj-Networks/nemotron-3-ultra" target="_blank" rel="noopener">github.com/Aj-Networks/nemotron-3-ultra</a></li>
+      </ul>
+    </section>
+  </main>
+</div>
+
+<footer>Not affiliated with NVIDIA or OpenCode. Free tier terms and model IDs can change. MIT License.</footer>
+
+<div class="lightbox" id="lightbox"><img alt=""></div>
+
+<script>
+  const TOTAL = 6;
+  const store = {
+    get(k) { try { return localStorage.getItem(k); } catch (e) { return null; } },
+    set(k, v) { try { localStorage.setItem(k, v); } catch (e) {} }
+  };
+
+  // Theme toggle
+  const themeBtn = document.getElementById('themeBtn');
+  function setTheme(t) {
+    document.documentElement.setAttribute('data-theme', t);
+    themeBtn.textContent = t === 'dark' ? '☀️ Light' : '🌙 Dark';
+    store.set('n3u-theme', t);
+  }
+  setTheme(store.get('n3u-theme') || (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'));
+  themeBtn.addEventListener('click', () => {
+    setTheme(document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark');
+  });
+
+  // OS switch
+  function setOS(os) {
+    document.body.classList.toggle('os-win', os === 'win');
+    document.body.classList.toggle('os-unix', os === 'unix');
+    document.querySelectorAll('[data-set-os]').forEach(b => b.classList.toggle('active', b.dataset.setOs === os));
+    store.set('n3u-os', os);
+  }
+  document.querySelectorAll('[data-set-os]').forEach(b => b.addEventListener('click', () => setOS(b.dataset.setOs)));
+  const savedOS = store.get('n3u-os') || (/Mac|Linux/.test(navigator.platform) ? 'unix' : 'win');
+  setOS(savedOS);
+
+  // Progress
+  let done = [];
+  try { done = JSON.parse(store.get('n3u-done') || '[]'); } catch (e) { done = []; }
+  function render() {
+    for (let i = 1; i <= TOTAL; i++) {
+      const isDone = done.includes(i);
+      const card = document.querySelector(`.card[data-step="${i}"]`);
+      card.classList.toggle('done', isDone);
+      card.querySelector('.mark').textContent = isDone ? '✓ Completed' : 'Mark step complete';
+      document.querySelector(`.nav a[data-step="${i}"]`).classList.toggle('done', isDone);
+    }
+    document.getElementById('bar').style.width = (done.length / TOTAL * 100) + '%';
+    document.getElementById('barLabel').textContent = `${done.length} of ${TOTAL} steps`;
+  }
+  document.querySelectorAll('[data-mark]').forEach(btn => btn.addEventListener('click', () => {
+    const n = Number(btn.dataset.mark);
+    if (done.includes(n)) {
+      done = done.filter(x => x !== n);
+    } else {
+      done.push(n);
+      const next = document.getElementById('step-' + (n + 1)) || document.getElementById('finish');
+      next.scrollIntoView();
+    }
+    store.set('n3u-done', JSON.stringify(done));
+    render();
+  }));
+  render();
+
+  // Copy buttons
+  document.querySelectorAll('.copy').forEach(btn => btn.addEventListener('click', () => {
+    const text = btn.parentElement.querySelector('pre').innerText;
+    navigator.clipboard.writeText(text).then(() => {
+      btn.textContent = 'Copied';
+      setTimeout(() => btn.textContent = 'Copy', 1500);
+    });
+  }));
+
+  // Active section in sidebar
+  const links = [...document.querySelectorAll('.nav a')];
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        links.forEach(l => l.classList.toggle('active', l.getAttribute('href') === '#' + e.target.id));
+      }
+    });
+  }, { rootMargin: '-30% 0px -60% 0px' });
+  document.querySelectorAll('main section[id]').forEach(s => observer.observe(s));
+
+  // Screenshot zoom
+  const lb = document.getElementById('lightbox');
+  document.querySelectorAll('figure img').forEach(img => img.addEventListener('click', () => {
+    lb.querySelector('img').src = img.src;
+    lb.querySelector('img').alt = img.alt;
+    lb.classList.add('open');
+  }));
+  lb.addEventListener('click', () => lb.classList.remove('open'));
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') lb.classList.remove('open'); });
+</script>
 </body>
 </html>
