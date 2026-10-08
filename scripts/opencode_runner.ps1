@@ -1,8 +1,8 @@
 <#>
 .SYNOPSIS
-    Run Nemotron 3 Ultra + OpenCode with full Phase 1-3 verification
+    Run Nemotron 3 Ultra + OpenCode with setup checks and project memory
 .DESCRIPTION
-    Executes the complete pipeline: Phase 1 (setup verify), Phase 2 (memory activate), Phase 3 (dual-verification), then launches OpenCode.
+    Executes the complete pipeline: Phase 1 (setup verify), Phase 2 (memory into AGENTS.md), then launches OpenCode. -VerifyOnly also runs the Phase 3 checker self-test.
 .PARAMETER ProjectName
     Project name (default: "default")
 .PARAMETER SkipPhase1

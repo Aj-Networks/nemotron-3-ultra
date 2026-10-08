@@ -54,7 +54,7 @@ class OpenCodeRunner:
 
         print(f"[PASS] Phase 2 COMPLETE")
         print(f"   System prompt: {summary['system_prompt_file']}")
-        print(f"   Init script: {summary['init_script_file']}")
+        print(f"   Loaded into OpenCode via: {summary['agents_file']}")
         print(f"   Global memory: {summary['global_memory_chars']} chars")
         print(f"   Project memory: {summary['project_memory_chars']} chars")
 
@@ -69,17 +69,14 @@ class OpenCodeRunner:
         # Set environment for OpenCode
         env = os.environ.copy()
         env["NEMOTRON_PROJECT"] = self.project_name
-        env["NEMOTRON_SYSTEM_PROMPT"] = phase2_summary["system_prompt_file"]
-        env["NEMOTRON_INIT_SCRIPT"] = phase2_summary["init_script_file"]
 
         # Change to project directory
         os.chdir(self.project_path)
 
         print(f"Project: {self.project_name}")
         print(f"Working dir: {self.project_path}")
-        print(f"System prompt loaded from: {phase2_summary['system_prompt_file']}")
+        print(f"Memory loaded via: {phase2_summary['agents_file']}")
         print("\nStarting OpenCode... (Type '/models' to select Nemotron 3 Ultra)")
-        print("Phase 3 verification active: ALL responses will be double-checked")
         print("=" * 60)
 
         # Launch OpenCode
@@ -96,7 +93,7 @@ class OpenCodeRunner:
     def test_phase3(self):
         """Test Phase 3 verification with sample responses."""
         print("\n" + "=" * 60)
-        print("PHASE 3: TESTING DUAL-VERIFICATION")
+        print("PHASE 3: REPLY CHECKER SELF-TEST")
         print("=" * 60)
 
         test_cases = [
@@ -143,9 +140,6 @@ class OpenCodeRunner:
             print("\n[PASS] All phases complete (verify-only mode)")
             return 0
 
-        # Phase 3 is integrated into OpenCode via system prompt
-        print("\nPhase 3: Dual-verification ENABLED via system prompt")
-        print("   Every response will pass 2 verification rounds before output")
 
         # Launch OpenCode
         return self.run_opencode(phase2_summary)
