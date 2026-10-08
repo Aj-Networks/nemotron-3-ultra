@@ -13,6 +13,7 @@
 memory/global/MEMORY.md
 cache/
 projects/*/MEMORY.md
+projects/*/AGENTS.md
 projects/*/input/
 projects/*/output/
 projects/*/cache/
