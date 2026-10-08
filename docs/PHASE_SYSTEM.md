@@ -28,12 +28,12 @@ This document explains the three-phase system that ensures accuracy, memory pers
 │  ✓ Load official limitations (docs/00-limitations.md)          │
 │  ✓ Load recent cache context                                    │
 │  ✓ Build complete system prompt                                 │
-│  ✓ Write activation files to project cache                      │
+│  ✓ Write AGENTS.md (OpenCode loads it automatically)            │
 └─────────────────────────────────────────────────────────────────┘
                               │
                               ▼
 ┌─────────────────────────────────────────────────────────────────┐
-│  PHASE 3: DUAL-VERIFICATION ACCURACY LAYER                     │
+│  PHASE 3: REPLY CHECKER (self-test only, --verify-only)        │
 │  ┌─────────────────┐  ┌─────────────────┐                      │
 │  │   PASS 1        │  │   PASS 2        │                      │
 │  │ (Standard)      │  │ (Stricter)      │                      │
@@ -54,9 +54,9 @@ This document explains the three-phase system that ensures accuracy, memory pers
                               ▼
 ┌─────────────────────────────────────────────────────────────────┐
 │                    OPENCODE READY                               │
-│  • System prompt injected                                       │
+│  • AGENTS.md loaded by OpenCode                                 │
 │  • Memory active                                                │
-│  • Verification enabled                                         │
+│  • Setup verified                                               │
 │  • Project context loaded                                       │
 └─────────────────────────────────────────────────────────────────┘
 ```
@@ -124,7 +124,7 @@ python scripts/phase1_verify.py my-project
 5. Builds complete system prompt with all context
 6. Writes to project cache:
    - `cache/system_prompt.md`: Full system prompt
-   - `cache/opencode_init.js`: OpenCode initialization script
+   - `AGENTS.md` (project folder): same prompt, read by OpenCode on startup
    - `cache/activation_summary.json`: Metadata
 
 **System prompt includes:**
@@ -142,7 +142,9 @@ python scripts/phase1_verify.py my-project
 python scripts/phase2_activate.py my-project
 ```
 
-### Phase 3: Dual Verification (`scripts/phase3_verify.py`)
+### Phase 3: Reply Checker (`scripts/phase3_verify.py`)
+
+> **Scope:** rule-based checks run only as a self-test on sample replies (`--verify-only`). They do not intercept live OpenCode replies. Live accuracy relies on the instructions in `AGENTS.md`.
 
 **Pass 1 Checks (Standard):**
 | Check | Description | Threshold |
@@ -170,16 +172,13 @@ The runner (`scripts/opencode_runner.py`) automatically:
 
 1. Runs Phase 1 (unless `--skip-phase1`)
 2. Runs Phase 2, generates system prompt
-3. Sets environment variables for OpenCode:
-   - `NEMOTRON_PROJECT` = project name
-   - `NEMOTRON_SYSTEM_PROMPT` = path to system prompt
-   - `NEMOTRON_INIT_SCRIPT` = path to init script
+3. Writes the prompt to `projects/<name>/AGENTS.md`
 4. Changes to project directory
 5. Launches `opencode`
 
 ### How OpenCode Uses the System Prompt
 
-When OpenCode starts, it reads the system prompt from the environment. The Phase 2 generated prompt includes instructions for the model to:
+OpenCode automatically reads `AGENTS.md` from the folder it starts in. The Phase 2 prompt asks the model to:
 
 1. **Self-verify** before responding (internal Phase 3)
 2. **Check twice** - explicitly reason through verification steps
@@ -188,19 +187,13 @@ When OpenCode starts, it reads the system prompt from the environment. The Phase
 
 ### Manual OpenCode Integration
 
-If not using the runner, add to your OpenCode config:
+If not using the runner, run Phase 2 once, then start `opencode` from `projects/<name>/` so it picks up `AGENTS.md`:
 
-```json
-{
-  "agent": {
-    "build": {
-      "systemPromptFile": "projects/my-project/cache/system_prompt.md"
-    }
-  }
-}
+```bash
+python scripts/phase2_activate.py my-project
+cd projects/my-project
+opencode
 ```
-
-Or source the init script in your shell before running opencode.
 
 ## Verification Logs
 
@@ -258,11 +251,11 @@ Create `projects/<name>/.phase-config.json`:
 ```
 projects/<name>/
 ├── MEMORY.md                 # Project memory (persistent)
+├── AGENTS.md                 # Phase 2: prompt OpenCode reads on startup
 ├── input/                    # Your input files
 ├── output/                   # Generated outputs
 └── cache/
     ├── system_prompt.md      # Phase 2: Full system prompt
-    ├── opencode_init.js      # Phase 2: OpenCode init script
     ├── activation_summary.json
     └── verification_*.json   # Phase 3: Verification logs
 ```

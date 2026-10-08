@@ -31,9 +31,8 @@ python scripts/opencode_runner.py my-project
 ## What you get
 
 - **Free model**: 550B params, up to 1M context, via NVIDIA's free tier
-- **Memory**: global and per-project, kept between sessions
-- **Checks**: setup verified before launch, replies checked twice
-- **Rate limiting**: stays inside free-tier limits
+- **Memory**: global and per-project notes, loaded into OpenCode automatically (via `AGENTS.md`)
+- **Checks**: setup verified before launch (Node.js, OpenCode, API key, config, folders)
 - **Self-host option**: vLLM or SGLang, Kong gateway, Grafana dashboards (Docker)
 
 ## Docs
@@ -47,7 +46,7 @@ python scripts/opencode_runner.py my-project
 
 ## Good to know
 
-- Free tier is roughly 10-20 requests/min with no SLA.
+- Free tier is roughly 10-20 requests/min with no SLA. No built-in throttling: if you hit `429`, wait a minute.
 - NVIDIA logs free-tier usage. Don't send confidential code.
 - Not affiliated with NVIDIA or OpenCode.
 
