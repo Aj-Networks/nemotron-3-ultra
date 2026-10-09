@@ -5,6 +5,7 @@ Token bucket implementation with per-user/project isolation.
 """
 
 import time
+import asyncio
 import threading
 from collections import defaultdict
 from dataclasses import dataclass, field
