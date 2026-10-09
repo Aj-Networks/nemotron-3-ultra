@@ -18,6 +18,10 @@ MEMORY_PROJECTS = ROOT / "projects"
 CACHE_GLOBAL = ROOT / "cache" / "global"
 CACHE_PROJECTS = ROOT / "cache" / "projects"
 
+# Cache TTL in hours (configurable via env var)
+CACHE_TTL_HOURS = int(os.environ.get("CACHE_TTL_HOURS", "24"))
+CACHE_TTL_SECONDS = CACHE_TTL_HOURS * 3600
+
 
 def ensure_dirs():
     """Create all required directories."""
@@ -118,8 +122,8 @@ def cache_get(project: str, key: str) -> Optional[str]:
     cache_file = cache_dir / f"{key}.json"
     if cache_file.exists():
         data = json.loads(cache_file.read_text())
-        # Check TTL (default 24 hours)
-        if (datetime.now() - datetime.fromisoformat(data["timestamp"])).total_seconds() < 86400:
+        # Check TTL (configurable via CACHE_TTL_HOURS env var, default 24h)
+        if (datetime.now() - datetime.fromisoformat(data["timestamp"])).total_seconds() < CACHE_TTL_SECONDS:
             return data["response"]
     return None
 
@@ -162,11 +166,32 @@ def show_status():
         print(f"  Project '{p}': {len(list(pcache.glob('*.json')))} cache entries")
 
 
+def delete_project(name: str, confirm: bool = False) -> bool:
+    """Delete a project and all its data."""
+    if not confirm:
+        print(f"WARNING: This will permanently delete project '{name}' and all its data.")
+        print("Run with --confirm to proceed.")
+        return False
+
+    project_path = MEMORY_PROJECTS / name
+    project_cache = CACHE_PROJECTS / name
+
+    if not project_path.exists():
+        print(f"Project '{name}' does not exist.")
+        return False
+
+    import shutil
+    shutil.rmtree(project_path, ignore_errors=True)
+    shutil.rmtree(project_cache, ignore_errors=True)
+    print(f"Deleted project '{name}'")
+    return True
+
+
 if __name__ == "__main__":
     import sys
     if len(sys.argv) < 2:
         print("Usage: python memory_manager.py <command> [args]")
-        print("Commands: init <name> [desc], list, status, sync, cache-get <project> <key>, cache-set <project> <key> <response>")
+        print("Commands: init <name> [desc], list, status, sync, delete <name> [--confirm], cache-get <project> <key>, cache-set <project> <key> <response>")
         sys.exit(1)
 
     cmd = sys.argv[1]
@@ -181,6 +206,13 @@ if __name__ == "__main__":
         show_status()
     elif cmd == "sync":
         sync_global_memory()
+    elif cmd == "delete":
+        name = sys.argv[2] if len(sys.argv) > 2 else ""
+        confirm = "--confirm" in sys.argv
+        if not name:
+            print("Error: project name required")
+            sys.exit(1)
+        delete_project(name, confirm)
     elif cmd == "cache-get":
         project, key = sys.argv[2], sys.argv[3]
         val = cache_get(project, key)
