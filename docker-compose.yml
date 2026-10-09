@@ -111,15 +111,22 @@ services:
       - KONG_PROXY_ERROR_LOG=/dev/stderr
       - KONG_ADMIN_ERROR_LOG=/dev/stderr
       - KONG_ADMIN_LISTEN=0.0.0.0:8001
+      - KONG_ADMIN_GUI_LISTEN=0.0.0.0:8002
     volumes:
       - ./gateway/kong.yml:/kong/kong.yml:ro
     ports:
-      - "8000:8000"
+      - "8080:8000"
       - "8443:8443"
       - "8001:8001"
     depends_on:
       - nemotron-vllm
     restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/status"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
 
   # Prometheus for metrics
   prometheus:
@@ -143,7 +150,7 @@ services:
     container_name: nemotron-grafana
     environment:
       - GF_SECURITY_ADMIN_USER=admin
-      - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_PASSWORD:-admin}
+      - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_PASSWORD:?Set GRAFANA_PASSWORD in .env}
       - GF_USERS_ALLOW_SIGN_UP=false
     volumes:
       - ./monitoring/dashboards:/etc/grafana/provisioning/dashboards:ro
@@ -159,12 +166,17 @@ services:
   redis:
     image: redis:7-alpine
     container_name: nemotron-redis
-    command: redis-server --maxmemory 256mb --maxmemory-policy allkeys-lru
+    command: redis-server --maxmemory 256mb --maxmemory-policy allkeys-lru --appendonly yes --appendfsync everysec
     ports:
       - "6379:6379"
     volumes:
       - redis-data:/data
     restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
 
 volumes:
   prometheus-data:
@@ -172,7 +184,8 @@ volumes:
   redis-data:
 
 # Usage:
-# 1. Set MODEL_PATH to your Nemotron 3 Ultra NVFP4 checkpoint
-# 2. For free API tier: comment out nemotron-vllm/sglang, use gateway to proxy to NVIDIA
-# 3. Run: docker-compose up -d
-# 4. Access: http://localhost:8000 (API), http://localhost:3000 (Grafana), http://localhost:9090 (Prometheus)
+# 1. Set MODEL_PATH to your Nemotron 3 Ultra NVFP4 checkpoint (from huggingface.co/nvidia/NVIDIA-Nemotron-3-Ultra-550B-A55B-NVFP4)
+# 2. For 1M context: add VLLM_ALLOW_LONG_MAX_MODEL_LEN=1 to vLLM environment, set --max-model-len 1048576
+# 3. For free API tier: comment out nemotron-vllm/sglang, use gateway to proxy to NVIDIA
+# 4. Run: docker-compose up -d
+# 5. Access: http://localhost:8080 (API via Gateway), http://localhost:8000 (vLLM direct), http://localhost:3000 (Grafana), http://localhost:9090 (Prometheus)
