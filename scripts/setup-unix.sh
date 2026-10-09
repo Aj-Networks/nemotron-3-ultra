@@ -29,6 +29,15 @@ echo "Installing OpenCode..."
 npm install -g opencode-ai
 echo "OpenCode installed"
 
+# Verify OpenCode installation
+if command -v opencode &> /dev/null; then
+    OC_VER=$(opencode --version)
+    echo "OpenCode verified: $OC_VER"
+else
+    echo "Error: OpenCode installed but not in PATH. Restart shell and try again."
+    exit 1
+fi
+
 # 3. Get API Key
 if [[ -z "$API_KEY" ]]; then
     echo ""

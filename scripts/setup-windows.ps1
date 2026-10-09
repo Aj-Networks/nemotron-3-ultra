@@ -44,6 +44,15 @@ try {
     exit 1
 }
 
+# Verify OpenCode installation
+try {
+    $ocVer = opencode --version
+    Write-Host "OpenCode verified: $ocVer" -ForegroundColor Green
+} catch {
+    Write-Error "OpenCode installed but not in PATH. Restart shell and try again."
+    exit 1
+}
+
 # 3. Get API Key
 if (-not $ApiKey) {
     Write-Host "`nEnter your NVIDIA API key (from https://build.nvidia.com):" -ForegroundColor Cyan
