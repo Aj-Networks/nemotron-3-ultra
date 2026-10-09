@@ -14,7 +14,7 @@ OpenCode sends its own instructions and tool definitions with every session (oft
 
 ## Privacy
 
-NVIDIA logs free endpoint usage for security and product improvement. Do **not** send:
+NVIDIA logs free endpoint usage for security and product improvement per [API Trial Terms](https://assets.ngc.nvidia.com/products/api-catalog/legal/NVIDIA%20API%20Trial%20Terms%20of%20Service.pdf). Do **not** send:
 
 - Confidential work or client data
 - Passwords, keys, or personal data

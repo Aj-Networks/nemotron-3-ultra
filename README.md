@@ -46,8 +46,8 @@ python scripts/opencode_runner.py my-project
 
 ## Good to know
 
-- Free tier is roughly 10-20 requests/min with no SLA. No built-in throttling: if you hit `429`, wait a minute.
-- NVIDIA logs free-tier usage. Don't send confidential code.
+- Free tier: NVIDIA does not publish rate limits. Community observes ~10-20 requests/min before 429. No built-in throttling: if you hit `429`, wait a minute.
+- NVIDIA logs free-tier usage per [API Trial Terms](https://assets.ngc.nvidia.com/products/api-catalog/legal/NVIDIA%20API%20Trial%20Terms%20of%20Service.pdf). Don't send confidential code.
 - Not affiliated with NVIDIA or OpenCode.
 
 ## Feedback
