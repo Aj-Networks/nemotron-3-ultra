@@ -1,6 +1,6 @@
 # Official Nemotron 3 Ultra 550B-A55B Limitations
 
-Source: NVIDIA build.nvidia.com model card (updated 2026-06-04)
+Source: NVIDIA build.nvidia.com model card (updated 2026-06-04) | [Technical Report](https://research.nvidia.com/labs/nemotron/files/NVIDIA-Nemotron-3-Ultra-Technical-Report.pdf) | [API Trial Terms](https://assets.ngc.nvidia.com/products/api-catalog/legal/NVIDIA%20API%20Trial%20Terms%20of%20Service.pdf)
 
 ## Model Specifications
 
@@ -18,12 +18,12 @@ Source: NVIDIA build.nvidia.com model card (updated 2026-06-04)
 
 | Limit | Value |
 |-------|-------|
-| **Rate limit** | Not publicly documented. Expect burst limits per minute/hour. |
+| **Rate limit** | Not publicly documented by NVIDIA. Community observes ~10-20 req/min before 429. |
 | **Daily quota** | Not publicly documented. |
 | **Max tokens/request** | 1,000,000 (context) / ~32,768 (output typical) |
 | **Concurrent requests** | Limited (single-digit typically) |
 | **Session persistence** | None. Stateless per request. |
-| **Logging** | NVIDIA logs usage for security and product improvement. |
+| **Logging** | NVIDIA logs usage per [API Trial Terms](https://assets.ngc.nvidia.com/products/api-catalog/legal/NVIDIA%20API%20Trial%20Terms%20of%20Service.pdf). Don't send confidential code. |
 
 ## Local Deployment Requirements (Self-Hosted)
 
@@ -36,7 +36,7 @@ Source: NVIDIA build.nvidia.com model card (updated 2026-06-04)
 | **Container Runtime** | vLLM 0.22.0+, SGLang 0.5.11+, TRT-LLM 1.3.0rc17+ |
 | **Tensor Parallel** | Required (tp=4 minimum) |
 | **Expert Parallel** | Required (ep=4) |
-| **Context at 1M** | Requires `VLLM_ALLOW_LONG_MAX_MODEL_LEN=1` or SGLang equivalent |
+| **Context at 1M** | Requires `VLLM_ALLOW_LONG_MAX_MODEL_LEN=1` (vLLM) or `SGLANG_ALLOW_OVERWRITE_LONGER_CONTEXT_LEN=1` (SGLang) |
 
 ## API Integration Constraints
 
@@ -51,19 +51,22 @@ Source: NVIDIA build.nvidia.com model card (updated 2026-06-04)
 | **Chunked Prefill** | Required for long context. |
 | **Prefix Caching** | Enabled by default on supported backends. |
 
-## Known Behavioral Limits
+## Known Behavioral Limits (source: [Hugging Face model card](https://huggingface.co/nvidia/NVIDIA-Nemotron-3-Ultra-550B-A55B-NVFP4))
 
-| Area | Limitation |
-|------|------------|
-| **Hallucination** | Non-hallucination rate ~75-79% on OmniScience (NVFP4) |
-| **Math (GPQA)** | 87-88% (no tools) |
-| **SWE-Bench Verified** | 71.9% (BF16) / 69.7% (NVFP4) |
-| **Long Context (RULER 1M)** | 94.7% (BF16) / 94.0% (NVFP4) |
-| **Agentic (Terminal Bench)** | 56.4% (BF16) / 53.9% (NVFP4) |
-| **Multilingual** | 12 languages. Quality varies. |
-| **Coding (43 languages)** | Strong in Python, JS, TS, Rust, Go, C++. Weaker in niche languages. |
+| Area | BF16 | NVFP4 | Notes |
+|------|------|-------|-------|
+| **Hallucination (OmniScience Non-Hallucination)** | 78.7% | 75.5% | |
+| **Math (GPQA, no tools)** | 87.0% | 87.9% | |
+| **SWE-Bench Verified** | 70.7% | 69.5% | |
+| **Long Context (RULER 1M)** | 94.7% | 94.0% | |
+| **Agentic (Terminal Bench 2.1)** | 56.4% | 53.9% | |
+| **TauBench V3 (Average)** | 70.9% | 70.3% | Banking only 22.6%/19.2% |
+| **BrowseComp** | 44.4% | 41.4% | |
+| **SWE-Bench Multilingual** | 67.7% | 69.1% | |
+| **Multilingual** | 12 languages | 12 languages | Quality varies by language |
+| **Coding (43 languages in pre-training)** | Strong in Python, JS, TS, Rust, Go, C++ | Weaker in niche languages | Pre-training coverage, not guaranteed proficiency |
 
-## Free Tier Practical Limits (Observed)
+## Free Tier Practical Limits (Community Observed, Not Official)
 
 | Metric | Typical |
 |--------|---------|
@@ -72,6 +75,8 @@ Source: NVIDIA build.nvidia.com model card (updated 2026-06-04)
 | **Session length** | Resets on rate limit or quota |
 | **Key rotation** | Manual via build.nvidia.com |
 | **No SLA** | Free tier can be throttled or disabled anytime |
+
+> **Note:** NVIDIA does not publish official free tier limits. The above are community observations. Monitor for 429 responses and implement exponential backoff.
 
 ## Cost Estimation (If Moving Off Free Tier)
 
