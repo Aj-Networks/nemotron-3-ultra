@@ -305,9 +305,13 @@
 python --version</pre><button class="copy">Copy</button></div>
       <div class="code" data-os="unix"><pre>node -v
 python3 --version</pre><button class="copy">Copy</button></div>
-      <figure>
+      <figure data-os="win">
         <img src="assets/images/01-node-version.png" alt="PowerShell showing node and python versions" loading="lazy">
         <figcaption>Both commands print a version number.</figcaption>
+      </figure>
+      <figure data-os="unix">
+        <img src="assets/images/01-node-version-mac.png" alt="Terminal on macOS showing node and python3 versions" loading="lazy">
+        <figcaption>Both commands print a version number. macOS shown; Linux looks the same.</figcaption>
       </figure>
       <div class="callout check"><strong>It worked if</strong>You see a version for each, for example <code>v22.x</code> and <code>Python 3.x</code>.</div>
       <div class="dodont">
@@ -323,9 +327,13 @@ python3 --version</pre><button class="copy">Copy</button></div>
       <p class="goal">Install the terminal app that talks to the model.</p>
       <div class="code"><pre>npm i -g opencode-ai
 opencode --version</pre><button class="copy">Copy</button></div>
-      <figure>
+      <figure data-os="win">
         <img src="assets/images/02-opencode-install.png" alt="OpenCode installed and version shown" loading="lazy">
         <figcaption>OpenCode installed and printing its version.</figcaption>
+      </figure>
+      <figure data-os="unix">
+        <img src="assets/images/02-opencode-install-mac.png" alt="OpenCode installed on macOS and version shown" loading="lazy">
+        <figcaption>OpenCode installed and printing its version. macOS shown; Linux looks the same.</figcaption>
       </figure>
       <div class="callout check"><strong>It worked if</strong><code>opencode --version</code> prints a number such as <code>1.18.35</code>.</div>
       <div class="callout note"><strong>Optional</strong>The setup script in step 4 also installs OpenCode. Doing it here just confirms npm works.</div>
@@ -376,9 +384,13 @@ cd nemotron-3-ultra</pre><button class="copy">Copy</button></div>
 ./scripts/setup-unix.sh my-project</pre><button class="copy">Copy</button></div>
       </div>
       <p>When asked, paste your API key and press Enter.</p>
-      <figure>
+      <figure data-os="win">
         <img src="assets/images/04-setup-script.png" alt="Setup script installing OpenCode and asking for the API key" loading="lazy">
         <figcaption>The script installs OpenCode, then asks for your key.</figcaption>
+      </figure>
+      <figure data-os="unix">
+        <img src="assets/images/04-setup-script-mac.png" alt="macOS setup script installing OpenCode and saving the config" loading="lazy">
+        <figcaption>The script installs OpenCode, then asks for your key. macOS shown; Linux looks the same.</figcaption>
       </figure>
       <div class="dodont">
         <div class="callout do"><strong>✅ Do</strong><ul>
@@ -405,9 +417,13 @@ cd nemotron-3-ultra</pre><button class="copy">Copy</button></div>
 python scripts/opencode_runner.py my-project --verify-only</pre><button class="copy">Copy</button></div>
       <div class="code" data-os="unix"><pre>cd path/to/nemotron-3-ultra
 python3 scripts/opencode_runner.py my-project --verify-only</pre><button class="copy">Copy</button></div>
-      <figure>
+      <figure data-os="win">
         <img src="assets/images/05-phase-checks.png" alt="All Phase 1 to 3 checks passing" loading="lazy">
         <figcaption>Phase 1 checks your setup, Phase 2 loads your memory into OpenCode, Phase 3 self-tests the reply checker.</figcaption>
+      </figure>
+      <figure data-os="unix">
+        <img src="assets/images/05-phase-checks-mac.png" alt="All checks passing on macOS" loading="lazy">
+        <figcaption>Phase 1 checks your setup, Phase 2 loads your memory into OpenCode, Phase 3 self-tests the reply checker. macOS shown; Linux looks the same.</figcaption>
       </figure>
       <div class="callout check"><strong>It worked if</strong>Every line says <code>PASS</code> and the last line says <code>All phases complete</code>.</div>
       <div class="callout note"><strong>New terminal, new folder</strong>Every new terminal starts in your home folder. Always <code>cd</code> into the repo first.</div>
@@ -425,9 +441,13 @@ python3 scripts/opencode_runner.py my-project --verify-only</pre><button class="
         <li>Try a first prompt:</li>
       </ol>
       <div class="code"><pre>explain what this repo does in 3 bullet points</pre><button class="copy">Copy</button></div>
-      <figure>
+      <figure data-os="win">
         <img src="assets/images/06-opencode-running.png" alt="OpenCode answering a prompt with Nemotron 3 Ultra" loading="lazy">
-        <figcaption>Nemotron 3 Ultra answering inside OpenCode. The cost shown ($0.03) is OpenCode's own estimate. NVIDIA's free tier does not charge you.</figcaption>
+        <figcaption>Nemotron 3 Ultra answering inside OpenCode. The cost shown is OpenCode's own estimate. NVIDIA's free tier does not charge you.</figcaption>
+      </figure>
+      <figure data-os="unix">
+        <img src="assets/images/06-opencode-running-mac.png" alt="OpenCode on macOS answering with Nemotron 3 Ultra" loading="lazy">
+        <figcaption>Nemotron 3 Ultra answering inside OpenCode. The cost shown is OpenCode's own estimate. NVIDIA's free tier does not charge you. macOS shown; Linux looks the same.</figcaption>
       </figure>
       <div class="dodont">
         <div class="callout do"><strong>✅ Do</strong><ul><li>Type <code>/</code> commands inside OpenCode, not in the terminal</li><li>Exit with <code>Ctrl+C</code> or <code>/exit</code></li></ul></div>
