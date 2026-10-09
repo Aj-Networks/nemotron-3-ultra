@@ -68,13 +68,17 @@ class Phase1Verifier:
             Path.home() / ".config" / "opencode" / "opencode.json",
             ROOT / "examples" / "opencode.example.json",
         ]
+        valid_models = [
+            "nvidia/nemotron-3-ultra-550b-a55b",
+            "nvidia/nvidia/nemotron-3-ultra-550b-a55b",
+        ]
         found = False
         for p in config_paths:
             if p.exists():
                 try:
                     with open(p) as f:
                         config = json.load(f)
-                    if config.get("model") == "nvidia/nvidia/nemotron-3-ultra-550b-a55b":
+                    if config.get("model") in valid_models:
                         self.checks_passed.append(f"OpenCode config found at {p}")
                         found = True
                         break
